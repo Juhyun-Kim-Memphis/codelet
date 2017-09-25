@@ -13,7 +13,7 @@ using namespace std;
 class Flyweight
 {
   public:
-    /* extrinsicState is context information 
+    /* extrinsicState is context information (non-sharable)
      * client must give extrinsicState.
      */
     void operation(int extrinsicState) 
