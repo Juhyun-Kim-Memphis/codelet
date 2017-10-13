@@ -31,9 +31,8 @@ int   main( void)
     // SOCK_STREAM : TCP / SOCK_DGRAM : UDP
     // IPPROTO_TCP : TCP 이지만 0인 경우 type에서 미리 정해진 경우
 
-    if( -1 == server_socket)
-    {
-        printf( "server socket 생성 실패\n");
+    if( -1 == server_socket) {
+        printf( "server socket create fail\n");
         exit( 1);
     }
 
@@ -44,30 +43,26 @@ int   main( void)
 
     if( -1 == bind( server_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
     {
-        printf( "bind() 실행 에러\n");
+        printf( "bind() error \n");
         exit( 1);
     }
 
-    if( -1 == listen(server_socket, 5))
-    {
-        printf( "listen() 실행 실패\n");
+    if( -1 == listen(server_socket, 5)) {
+        printf( "listen() fail.\n");
         exit( 1);
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    while(!is_disconnected)
-    {
+    while(!is_disconnected) {
         client_addr_size  = sizeof( client_addr);
         client_socket     = accept( server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
         readn = 0;
-        buffer[0] = '\0'; //배열 초기화
+        buffer[0] = '\0';
         
-        while(client_socket)
-        {
+        while(client_socket) {
             char *p;
 
-            if ( -1 == client_socket)
-            {   
-                printf("클라이언트 연결 수락 실패\n");
+            if ( -1 == client_socket) {   
+                printf("client connection broken \n");
                 exit(1);
             }
 

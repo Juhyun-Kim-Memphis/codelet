@@ -9,9 +9,9 @@
 #include <errno.h>
 #include <signal.h>
 
-#define  BUFF_SIZE   1024
-#define PORT 4000 // 통신할 Port No 적는다.
-#define IP_ADDR "127.0.0.1" // 통신할 IP No 적는다.
+#define BUFF_SIZE   1024
+#define PORT 4000
+#define IP_ADDR "127.0.0.1"
 
 int main(void)
 {
@@ -35,28 +35,24 @@ int main(void)
     signal(SIGPIPE, SIG_IGN);
 
     client_socket  = socket( PF_INET, SOCK_STREAM, 0);
-    if( -1 == client_socket)
-    {
-        printf( "socket 생성 실패=%d\n",errno);
+    if( -1 == client_socket) {
+        printf( "socket create fail. ec = %d\n",errno);
         exit( 1);
     }
 
     memset( &server_addr, 0, sizeof( server_addr));
     server_addr.sin_family     = AF_INET;
-    server_addr.sin_port       = htons(PORT); //Port 번호
-    server_addr.sin_addr.s_addr= inet_addr(IP_ADDR); // 서버의 주소
+    server_addr.sin_port       = htons(PORT);
+    server_addr.sin_addr.s_addr= inet_addr(IP_ADDR);
 
-    if( -1 == connect( client_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
-    {
-        printf( "접속 실패. errno=%d\n", errno); 
+    if( -1 == connect( client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr) ) ) {
+        printf( "connect fail. errno=%d\n", errno); 
         exit( 1);
     }
-////////////////////////////////////////////////////////////////////////////////////////////////    
-    while(!is_disconnected)
-    {
-        if ( -1 == client_socket)
-        {
-            printf("서버 접속 실패=%d\n",errno);
+
+    while(!is_disconnected) {
+        if ( -1 == client_socket ) {
+            printf("fail to connect to server. ec=%d\n",errno);
             exit (1);
         }
   
@@ -64,8 +60,6 @@ int main(void)
         writen = 0;
         buffer[0] = '\0';
         
-        //buffer size 보내주기!
-//        write( client_socket, 
         while(client_socket){
 
             timer = time(NULL);
@@ -79,17 +73,16 @@ int main(void)
         
             int message[6]={ year, mon, day, hour, min, sec};
 
-            printf("%d년" "%d월" "%d일" "%d시" "%d분" "%d초\n",
+            printf("%d-%d-%d %d:%d:%d\n",
                    message[0],message[1],message[2],message[3],message[4],message[5]);
 
-            sprintf(buffer,"%d년" "%d월" "%d일" "%d시" "%d분" "%d초\n",
+            sprintf(buffer,"%d-%d-%d %d:%d:%d\n\n",
                    message[0],message[1],message[2],message[3],message[4],message[5]);
                     
             writen = write( client_socket, buffer, strlen(buffer));
             printf("writen_status: %d\n",writen);
 
-            if( -1 == writen)
-            {    
+            if( -1 == writen) {    
                 printf("if_error : %d [%s] \n",errno, strerror(errno));
                 close( client_socket);
                 exit(1);
@@ -97,8 +90,6 @@ int main(void)
             
             usleep(900000);
         }
-
-        
     }
     close( client_socket);
                                                  
