@@ -8,10 +8,10 @@
 #include <errno.h>
 #include <signal.h>
 
-#define  BUFF_SIZE   1024
-#define PORT 4000 // Åë½ÅÇÒ Port No Àû´Â´Ù.
+#define BUFF_SIZE   1024
+#define PORT 4000
 
-int   main( void)
+int main(void)
 {
     int   server_socket;
     int   client_socket;
@@ -26,20 +26,21 @@ int   main( void)
 
     signal(SIGPIPE, SIG_IGN);
 
-    server_socket  = socket( PF_INET, SOCK_STREAM, 0); //¼­¹ö Á¢¼ÓÀ» À§ÇÑ ¼ÒÄÏ »ı¼º
-    // PF_INET : ÀÎÅÍ³İ ÇÁ·ÎÅäÄİ(TCP/IP¸¦ »ç¿ëÇÏ±â À§ÇØ ±âº»ÀûÀ¸·Î ÀÎÅÍ³İ ÇÁ·ÎÅäÄİ ÁöÁ¤)
+    //ì„œë²„ ì ‘ì†ì„ ìœ„í•œ ì†Œì¼“ ìƒì„±
+    server_socket  = socket( PF_INET, SOCK_STREAM, 0);
+    // PF_INET : ì¸í„°ë„· í”„ë¡œí† ì½œ(TCP/IPë¥¼ ì‚¬ìš©í•˜ê¸° ìœ„í•´ ê¸°ë³¸ì ìœ¼ë¡œ ì¸í„°ë„· í”„ë¡œí† ì½œ ì§€ì •)
     // SOCK_STREAM : TCP / SOCK_DGRAM : UDP
-    // IPPROTO_TCP : TCP ÀÌÁö¸¸ 0ÀÎ °æ¿ì type¿¡¼­ ¹Ì¸® Á¤ÇØÁø °æ¿ì
+    // IPPROTO_TCP : TCP ì´ì§€ë§Œ 0ì¸ ê²½ìš° typeì—ì„œ ë¯¸ë¦¬ ì •í•´ì§„ ê²½ìš°
 
     if( -1 == server_socket) {
         printf( "server socket create fail\n");
         exit( 1);
     }
 
-    memset( &server_addr, 0, sizeof( server_addr)); //¸Ş¸ğ¸® ÃÊ±âÈ­
-    server_addr.sin_family     = AF_INET; //IPv4 ÀÎÅÍ³İ ÁÖ¼Ò Ã¼°è ÀúÀå
-    server_addr.sin_port       = htons( PORT); //»ç¿ëÇÒ port ¹øÈ£´Â 4000
-    server_addr.sin_addr.s_addr= htonl( INADDR_ANY); //32bit IPv4 ÁÖ¼Ò
+    memset( &server_addr, 0, sizeof( server_addr)); 
+    server_addr.sin_family     = AF_INET; //IPv4 ì¸í„°ë„· ì£¼ì†Œ ì²´ê³„ ì €ì¥
+    server_addr.sin_port       = htons(PORT);
+    server_addr.sin_addr.s_addr= htonl(INADDR_ANY); //32bit IPv4 ì£¼ì†Œ
 
     if( -1 == bind( server_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
     {
@@ -51,7 +52,8 @@ int   main( void)
         printf( "listen() fail.\n");
         exit( 1);
     }
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////
     while(!is_disconnected) {
         client_addr_size  = sizeof( client_addr);
         client_socket     = accept( server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
