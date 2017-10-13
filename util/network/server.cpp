@@ -7,15 +7,20 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <signal.h>
+#include <iostream>
+#include "util.hpp"
 
 #define BUFF_SIZE   1024
 #define PORT 4000
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    string portStr = getCmdOption(argc, argv, "-port=");
+    int port = stoi(portStr);
+
     int   server_socket;
     int   client_socket;
-    int   client_addr_size;
+    socklen_t   client_addr_size;
 
     int   readn;
     struct sockaddr_in   server_addr;
@@ -39,7 +44,7 @@ int main(void)
 
     memset( &server_addr, 0, sizeof( server_addr)); 
     server_addr.sin_family     = AF_INET; //IPv4 인터넷 주소 체계 저장
-    server_addr.sin_port       = htons(PORT);
+    server_addr.sin_port       = htons(port);
     server_addr.sin_addr.s_addr= htonl(INADDR_ANY); //32bit IPv4 주소
 
     if( -1 == bind( server_socket, (struct sockaddr*)&server_addr, sizeof( server_addr) ) )
@@ -47,6 +52,8 @@ int main(void)
         printf( "bind() error \n");
         exit( 1);
     }
+
+    cout<<"listen to port: "<<port<<"\n";
 
     if( -1 == listen(server_socket, 5)) {
         printf( "listen() fail.\n");

@@ -8,13 +8,23 @@
 #include <time.h>
 #include <errno.h>
 #include <signal.h>
+#include <iostream>
+#include <cstring>
+#include "util.hpp"
 
 #define BUFF_SIZE   1024
-#define PORT 4000
-#define IP_ADDR "127.0.0.1"
 
-int main(void)
+// client.exe -ip=127.0.0.1 -port=1000
+
+int main(int argc, char *argv[])
 {
+    string ipStr = getCmdOption(argc, argv, "-ip=");
+    string portStr = getCmdOption(argc, argv, "-port=");
+    int port = stoi(portStr);
+
+    cout<<"ip: "<<ipStr<<"\n";
+    cout<<"port: "<<port<<"\n";
+
     int   client_socket;
     struct sockaddr_in   server_addr;
 
@@ -42,12 +52,13 @@ int main(void)
 
     memset( &server_addr, 0, sizeof( server_addr));
     server_addr.sin_family     = AF_INET;
-    server_addr.sin_port       = htons(PORT);
-    server_addr.sin_addr.s_addr= inet_addr(IP_ADDR);
+    server_addr.sin_port       = htons(port);
+    server_addr.sin_addr.s_addr= inet_addr(ipStr.c_str());
 
     if( -1 == connect( client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr) ) ) {
-        printf( "connect fail. errno=%d\n", errno); 
-        exit( 1);
+        cout<<"connect fail. errno="<<errno<<"("
+            <<std::strerror(errno)<<")\n";
+        exit(1);
     }
 
     while(!is_disconnected) {
@@ -91,7 +102,7 @@ int main(void)
             usleep(900000);
         }
     }
-    close( client_socket);
+    close(client_socket);
                                                  
     return 0;
 }
