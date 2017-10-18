@@ -19,7 +19,7 @@ TEST_CASE("test module insert and Default IParam value of modules") {
     argv[2] = (char *)malloc(30);
     strcpy(argv[2], "40");
 
-    ArgumentParser argumentParser("i#", argc, argv);
+    ArgumentParser argumentParser("i#");
 
     int a;
     a = argumentParser.set('i');
