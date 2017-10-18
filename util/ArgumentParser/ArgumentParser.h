@@ -24,6 +24,7 @@
 
 //needed only during the testing phase
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
