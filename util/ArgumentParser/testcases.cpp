@@ -7,9 +7,8 @@
 #include "ArgumentParser.h"
 
 
-TEST_CASE("TEST1dsfdsfdsfds") {
+TEST_CASE("TEST #1") {
 
-    //cout << "eee" << endl;
     int argc = 3;
     char *argv[3];
     argv[0] = (char *) malloc(30);
@@ -21,11 +20,11 @@ TEST_CASE("TEST1dsfdsfdsfds") {
     argv[2] = (char *) malloc(30);
     strcpy(argv[2], "40");
 
-    ArgumentParser *ap = new ArgumentParser(argc, argv);
+    ArgumentParser *ap = new ArgumentParser();
 
     int a;
-    ap->set(&a, 'i');
+    //ap->set(&a, 'i');
 
 
-    REQUIRE(a == 40);
+    REQUIRE(a == 2);
 }

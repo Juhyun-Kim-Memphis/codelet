@@ -27,17 +27,18 @@ public:
     ArgumentParser();
     void init();
     void read(int arc, char** argv);
-    void set(int *varToSet, char key);
-    void set(double *varToSet, char key);
-    void set(float *varToSet, char key);
-    void set(string *varToSet, char key);
     void addVar(string varName);
     void rmVar(string varName);
 
+    int getInt(string key);
+    float getFloat(string key);
+    double getDouble(string key);
+    string getString(string key);
+
 private: 
     //private helper methods
-    map<char, string> separate(int argc, char** argv);
-    map<char, string> m;
+    map<string, string> separate(int argc, char** argv);
+    map<string, string> m;
     vector<string> varList;
     void addDefVar();
 };
