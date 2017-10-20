@@ -13,15 +13,47 @@
 
 #include "ArgumentParser.h"
 
-ArgumentParser::ArgumentParser(int argc, char** argv) {
-    //At the construction of the object, populate the map
+ArgumentParser::ArgumentParser() {
+    //empty constructor
+
+}
+
+void ArgumentParser::read(int argc, char **argv) {
+    //read from commandline, populate the map
     this->m = separate(argc, argv);
 }
 
-map<char, Variable*> ArgumentParser::separate(int argc, char** argv) {
+void ArgumentParser::init(){
+    //populate the map first
+
+    //1. add hard coded lists of variables to the map
+    this->varList.clear();
+    this->addDefVar();
+
+
+}
+
+void ArgumentParser::addDefVar() {
+    this->varList.push_back("a");
+    this->varList.push_back("b");
+    this->varList.push_back("c");
+
+    vector<string>::iterator it;
+    for (it = this->varList.begin(); it != this->varList.end(); it++){
+
+    }
+
+}
+
+
+//1. add : read from command line (so the constructor does not take params
+//2. mod : set -> simply return
+//3. mod :
+
+map<char, string> ArgumentParser::separate(int argc, char** argv) {
 
     //map for key & variable pairs
-    map<char, Variable*> m;
+    map<char, string> m;
 
     //Loop for all elements in argv, starts at 1 since program path is at 0 index
     for (int i = 1; i < argc; i++) {
@@ -29,26 +61,13 @@ map<char, Variable*> ArgumentParser::separate(int argc, char** argv) {
         if (argv[i][0] == '-' && argv[i][2] == NULL) {
             //FIND whether [i][1] exists in the map, if found put the value, if not, send back error
             //ASSUMES that only one string following the key is the value to put
-            switch (argv[i][1]) {
-                case 's':
-                    m['s'] = new StringVariable(argv[++i]);
+            m[(argv[i][1])] = argv[++i];
 
-                case 'f':
-                    //float will be implicitly converted (hopefully)
-                    m['f'] = new FloatVariable(atof(argv[++i]));
+//                    //none of the case matches - no such key exists
+//                    cout << "NO SUCH VARIABLE: \"" << argv[i][1] << "\" " << endl;
+//                    cout << "USE -i, -f, -d, or -s" << endl;
+//                            //no exception handling at the moment
 
-                case 'd':
-                    m['d'] = new DoubleVariable(atof(argv[++i]));
-
-                case 'i':
-                    m['i'] = new IntVariable(atoi(argv[++i]));
-
-                default:
-                    //none of the case matches - no such key exists
-                    cout << "NO SUCH VARIABLE: \"" << argv[i][1] << "\" " << endl;
-                    cout << "USE -i, -f, -d, or -s" << endl;
-                            //no exception handling at the moment
-            }
         }
     }
 
