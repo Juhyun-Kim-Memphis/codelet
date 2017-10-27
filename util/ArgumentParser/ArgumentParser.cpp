@@ -27,10 +27,10 @@ ArgumentParser::ArgumentParser() {
  */
 void ArgumentParser::init() {
     this->m.clear();
-    this->m["test_string"] = "this is a test string";
-    this->m["test_int"] = "12345";
-    this->m["test_float"] = "0.0001";
-    this->m["test_double"] = "1.111111111111";
+    //this->m["test_string"] = "this is a test string";
+    //this->m["test_int"] = "12345";
+    //this->m["test_float"] = "0.0001";
+    //this->m["test_double"] = "1.111111111111";
 }
 
 /**
@@ -40,7 +40,7 @@ void ArgumentParser::init() {
  */
 void ArgumentParser::read(int argc, char **argv) {
     //Read from commandline, separate variables, populate the map
-    this->m = separate(argc, argv);
+    this->separate(argc, argv);
 }
 
 /**
@@ -82,11 +82,16 @@ void ArgumentParser::rmVar(string varName) {
     (this->m).erase(varName);
 }
 
-
-void ArgumentParser::test_iterate() {
-    ///change this to iterate through the map
+//IT IS QUESTIONABLE WHETHER THIS METHOD WOULD BE REQUIRED OR NOT
+void ArgumentParser::test_showAll() {
     for (map<string, string>::iterator it = this->m.begin(); it != this->m.end(); it++) {
-        cout << it->first << ": " << it->second;
+        string val;
+        if (it->second == "") {
+            val = "N/A";
+        } else {
+            val = it->second;
+        }
+        cout << it->first << ": " << val;
         if (it != prev(this->m.end())) {
             cout << ", ";
         }
@@ -94,32 +99,25 @@ void ArgumentParser::test_iterate() {
     cout << endl;
 }
 
-map<string, string> ArgumentParser::separate(int argc, char **argv) {
-
-    //map for key & variable pairs
-    map<string, string> m;
-
+/**
+ * Most critical function of this application, gets the arguments; separates them; store them appropriately into the map.
+ * @param argc number of arguments passed
+ * @param argv value of the arguments
+ * @return fully populated map
+ */
+void ArgumentParser::separate(int argc, char **argv) {
     //local loop counter
     int i = 1;
 
     //Loop for all elements in argv, starts at 1 since program path is at the 0'th index
-    LOOLOOPY_LOOLOOPANG:
     do {
         //looking for keywords in each string
         if (argv[i][0] == '-') {
 
+            //Getting the variable name string without the hyphen deliminator
             string str(argv[i]);
+            str = str.substr(1, str.length());
 
-            //FIND whether argv[i] exists in the map.
-            //if found: put the value in the map
-            //if not: print out error, then skip to the next element
-            if (this->m.find(str) == m.end()) {
-                cout << "[ERROR]NO SUCH VARIABLE: \"" << argv[i][1] << "\" " << endl;
-                //skip to the next variable
-                i++;
-                goto LOOLOOPY_LOOLOOPANG;
-
-            }
             //CORNER CASE CHECK : for boolean variable
             //check if the following string is another keyword
             if (argv[i + 1][0] == '-') {
@@ -131,45 +129,53 @@ map<string, string> ArgumentParser::separate(int argc, char **argv) {
         //increment the loop counter
         i++;
     } while (i < argc);
-
-    //return the fucking map with shits in it
-    return m;
 }
-//
-///**
-// *
-// * @param varToSet pointer of the variable to be set with the value returned from the command line argument
-// * @param key should match one of the key values from separate method's switch.
-// * @return value to be set to the input variable
-// */
-//void ArgumentParser::set(int *varToSet, char key) {
-//    if (this->m.find(key) == this->m.end()) {
-//        cout << "No such key exists you moron, check and try again" << endl;
-//    } else {
-//        *varToSet = ((IntVariable *)(this->m[key]))->getVal();
-//    }
-//}
-//
-//void ArgumentParser::set(double *varToSet, char key) {
-//    if (this->m.find(key) == this->m.end()) {
-//        cout << "No such key exists you moron, check and try again" << endl;
-//    } else {
-//        *varToSet = ((DoubleVariable *)(this->m[key]))->getVal();
-//    }
-//}
-//
-//void ArgumentParser::set(float *varToSet, char key) {
-//    if (this->m.find(key) == this->m.end()) {
-//        cout << "No such key exists you moron, check and try again" << endl;
-//    } else {
-//        *varToSet = ((FloatVariable *)(this->m[key]))->getVal();
-//    }
-//}
-//
-//void ArgumentParser::set(string *varToSet, char key) {
-//    if (this->m.find(key) == this->m.end()) {
-//        cout << "No such key exists you moron, check and try again" << endl;
-//    } else {
-//        *varToSet = ((StringVariable *)(this->m[key]))->getVal();
-//    }
-//}
+
+/**
+ * Conversion method for string value to desired output value
+ * @tparam T
+ * @param key
+ * @param returnVal
+ * @return
+ */
+template<typename T>
+T ArgumentParser::getVal(string key, T returnVal) {
+    //If the key does not exist, print out a VERY RUDE error message.
+    if (this->m.find(key) == this->m.end()) {
+        cout << "No such key exists you moron, check and try again" << endl;
+    } else {
+        //try string conversion
+        this->sstream.str(this->m[key]);
+        if (!(this->sstream >> returnVal)) {
+            cout << "ERROR: CONVERSION FAILURE" << endl;
+        } else {
+            //if everything was successful, simply return the converted value.
+            return returnVal;
+        }
+    }
+}
+
+int ArgumentParser::getInt(string key) {
+    //Value to return
+    int returnVal;
+    return this->getVal(key, returnVal);
+}
+
+float ArgumentParser::getFloat(string key) {
+    //Value to return
+    float returnVal;
+    return this->getVal(key, returnVal);
+}
+
+double ArgumentParser::getDouble(string key) {
+    //Value to return
+    double returnVal;
+    return this->getVal(key, returnVal);
+}
+
+//Not really need to go through the conversion for the string as all the values are already stored as strings
+string ArgumentParser::getString(string key) {
+    //Value to return
+    string returnVal;
+    return this->getVal(key, returnVal);
+}
