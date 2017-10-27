@@ -13,57 +13,86 @@
 
 #include "ArgumentParser.h"
 
+/**
+ * One and only default constructor. Simply calls the intializer.
+ */
 ArgumentParser::ArgumentParser() {
     //empty constructor
+    this->init();
 }
 
+/**
+ * Initializer for the class. Clears out the pre-existing variable map
+ * then repopulate the map with default variables
+ */
+void ArgumentParser::init() {
+    this->m.clear();
+    this->m["test_string"] = "this is a test string";
+    this->m["test_int"] = "12345";
+    this->m["test_float"] = "0.0001";
+    this->m["test_double"] = "1.111111111111";
+}
+
+/**
+ * Read method that passes actual arguments from the commandline to separate() method.
+ * @param argc count of the argument from the command line
+ * @param argv value(s) of the arguments from the command line
+ */
 void ArgumentParser::read(int argc, char **argv) {
     //Read from commandline, separate variables, populate the map
     this->m = separate(argc, argv);
 }
 
-void ArgumentParser::init() {
-    //Clear the variable list
-    this->varList.clear();
-    //Populate the map with hard coded lists of variables
-    this->addDefVar();
+/**
+ * Setter for the variable. Set the value of a variable on runtime
+ * @param key name of the variable
+ * @param val value for the variable
+ */
+void ArgumentParser::set(string key, string val) {
+    //Check if the variable exists, if not, print out an error message.
+    if (this->m.find(key) == m.end()) {
+        cout << "[ERROR]NO SUCH VARIABLE: \"" << key << "\" " << endl;
+    } else {
+        //if the variable exists, set the value for the variable
+        this->m[key] = val;
+    }
 }
 
-void ArgumentParser::addVar(string varName){
-    //add the element to the vector
-    this->varList.push_back(varName);
-    //add the element to the map
-    (this->m)[varName] = "";
+/**
+ * Add a variable on runtime
+ * @param varName name of the variable
+ */
+void ArgumentParser::addVar(string varName) {
+    //If the variable with the same name does not exist
+    if (this->m.find(varName) == this->m.end()) {
+        //add the element to the map with a default value of blank.
+        (this->m)[varName] = "";
+    } else {
+        //If the variable already exists in the map, print out an error message
+        cout << "[ERROR]VARIABLE: \"" << varName << "\" ALREADY EXISTS" << endl;
+    }
 }
 
-void ArgumentParser::rmVar(string varName){
-    //remove the element from the vector
-    //
-    //NEEDS TO VERIFY IF THIS WORKS OR I SHOULD ITERATE THROUGH THE FUCKING VECTOR FOR LINEAR SEARCH AND DELETE
-    //
-    this->varList.erase(remove(varList.begin(), varList.end(), varName), varList.end());
+/**
+ * Remove a variable on runtime
+ * @param varName
+ */
+void ArgumentParser::rmVar(string varName) {
     //remove the element from the map
     (this->m).erase(varName);
 }
 
-void ArgumentParser::addDefVar() {
-    //For default variables, variable names must be HARD CODED HERE
-    this->varList.push_back("test_a");
-    this->varList.push_back("test_b");
-    this->varList.push_back("test_c");
 
-    vector<string>::iterator it;
-    for (it = this->varList.begin(); it != this->varList.end(); it++) {
-        //put empty values for now
-        //if the default variable needs default values, it needs to be HARD CODED HERE
-        this->m[*it] = "";
+void ArgumentParser::test_iterate() {
+    ///change this to iterate through the map
+    for (map<string, string>::iterator it = this->m.begin(); it != this->m.end(); it++) {
+        cout << it->first << ": " << it->second;
+        if (it != prev(this->m.end())) {
+            cout << ", ";
+        }
     }
+    cout << endl;
 }
-
-
-//1. add : read from command line (so the constructor does not take params
-//2. mod : set -> simply return
-//3. mod :
 
 map<string, string> ArgumentParser::separate(int argc, char **argv) {
 
@@ -74,7 +103,7 @@ map<string, string> ArgumentParser::separate(int argc, char **argv) {
     int i = 1;
 
     //Loop for all elements in argv, starts at 1 since program path is at the 0'th index
-    LOOP:
+    LOOLOOPY_LOOLOOPANG:
     do {
         //looking for keywords in each string
         if (argv[i][0] == '-') {
@@ -88,7 +117,7 @@ map<string, string> ArgumentParser::separate(int argc, char **argv) {
                 cout << "[ERROR]NO SUCH VARIABLE: \"" << argv[i][1] << "\" " << endl;
                 //skip to the next variable
                 i++;
-                goto LOOP;
+                goto LOOLOOPY_LOOLOOPANG;
 
             }
             //CORNER CASE CHECK : for boolean variable

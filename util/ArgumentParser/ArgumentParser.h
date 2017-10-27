@@ -19,6 +19,8 @@
 #include <map>
 #include <iostream>
 #include <vector>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -30,6 +32,10 @@ public:
     void addVar(string varName);
     void rmVar(string varName);
 
+    //testing method
+    void test_iterate();
+
+    void set(string key, string val);
     int getInt(string key);
     float getFloat(string key);
     double getDouble(string key);
@@ -39,8 +45,6 @@ private:
     //private helper methods
     map<string, string> separate(int argc, char** argv);
     map<string, string> m;
-    vector<string> varList;
-    void addDefVar();
 };
 
 #endif /* ARGUMENTPARSER_H */
