@@ -120,8 +120,8 @@ void ArgumentParser::separate(int argc, char **argv) {
 
             //CORNER CASE CHECK : for boolean variable
             //check if the following string is another keyword
-            if (argv[i + 1][0] == '-') {
-                this->m[str] = "TRUE";
+            if (i + 1 == argc || argv[i + 1][0] == '-') {
+                this->m[str] = "1";
             } else {
                 this->m[str] = argv[++i];
             }
@@ -144,12 +144,15 @@ T ArgumentParser::getVal(string key, T returnVal) {
     if (this->m.find(key) == this->m.end()) {
         cout << "No such key exists you moron, check and try again" << endl;
     } else {
+        //clear the stream first
+        this->sstream.clear();
         //try string conversion
         this->sstream.str(this->m[key]);
+        istringstream(this->m[key]);
+
         if (!(this->sstream >> returnVal)) {
-            cout << "ERROR: CONVERSION FAILURE" << endl;
+            cout << "[ERROR]CONVERSION FAILED WITH : " << "\"" << this->m[key] << "\"" << endl;
         } else {
-            //if everything was successful, simply return the converted value.
             return returnVal;
         }
     }
@@ -179,3 +182,15 @@ string ArgumentParser::getString(string key) {
     string returnVal;
     return this->getVal(key, returnVal);
 }
+
+bool ArgumentParser::getBool(string key) {
+    //Value to return
+    bool returnVal;
+    return this->getVal(key, returnVal);
+}
+
+//template<typename T>
+//T ArgumentParser::getObj(string key) {
+//    T returnVal;
+//    return this->getVal(key, returnVal);
+//}

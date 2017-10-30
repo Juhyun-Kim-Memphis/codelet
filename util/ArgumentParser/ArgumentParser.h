@@ -50,16 +50,14 @@ public:
 
     string getString(string key);
 
-    /*
-     * FOR TESTING: ADD A BOOL GETTER
-    bool getBool(string key);
-    */
 
-    /*
-     * FOR TESTING: ADD AN OBJECT GETTER
-    template<class T>
-    T getObj(string key);
-    */
+//    FOR TESTING: ADD A BOOL GETTER
+    bool getBool(string key);
+
+//    FOR TESTING: ADD AN OBJECT GETTER
+//    template<class T>
+//    T getObj(string key);
+
 
 private:
     //private helpers
