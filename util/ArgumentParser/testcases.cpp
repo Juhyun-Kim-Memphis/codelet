@@ -177,3 +177,29 @@ TEST_CASE("TEST #6: HOW ABOUT FALSE BOOLEAN?") {
     cout << "***END OF TEST #6" << endl;
 }
 
+TEST_CASE("TEST #7: ADD VAR") {
+    int argc = 3;
+    char *argv[3];
+
+    ArgumentParser *ap = new ArgumentParser();
+
+    argc = 3;
+    *argv[3];
+    argv[0] = (char *) malloc(30);
+    strcpy(argv[0], "cmd");
+
+    argv[1] = (char *) malloc(30);
+    strcpy(argv[1], "-p");
+
+    argv[2] = (char *) malloc(30);
+    strcpy(argv[2], "123");
+
+    ap->read(argc, argv);
+    ap->test_showAll();
+
+    int a = ap->getInt("p");
+
+    REQUIRE(a == 123);
+    cout << "***END OF TEST #6" << endl;
+}
+

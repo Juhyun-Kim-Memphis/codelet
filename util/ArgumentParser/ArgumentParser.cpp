@@ -27,7 +27,7 @@ ArgumentParser::ArgumentParser() {
  */
 void ArgumentParser::init() {
     this->m.clear();
-    //this->m["test_string"] = "this is a test string";
+    //this->m["abc"] = "0";
     //this->m["test_int"] = "12345";
     //this->m["test_float"] = "0.0001";
     //this->m["test_double"] = "1.111111111111";
@@ -106,29 +106,36 @@ void ArgumentParser::test_showAll() {
  * @return fully populated map
  */
 void ArgumentParser::separate(int argc, char **argv) {
-    //local loop counter
-    int i = 1;
 
-    //Loop for all elements in argv, starts at 1 since program path is at the 0'th index
-    do {
-        //looking for keywords in each string
-        if (argv[i][0] == '-') {
+    if (argc <= 1) {
+        cout << "[ERROR]NO ARGUMENTS DETECTED" << endl;
+    } else {
+        //local loop counter
+        int i = 1;
 
-            //Getting the variable name string without the hyphen deliminator
-            string str(argv[i]);
-            str = str.substr(1, str.length());
 
-            //CORNER CASE CHECK : for boolean variable
-            //check if the following string is another keyword
-            if (i + 1 == argc || argv[i + 1][0] == '-') {
-                this->m[str] = "1";
-            } else {
-                this->m[str] = argv[++i];
+        //Loop for all elements in argv, starts at 1 since program path is at the 0'th index
+        do {
+            //looking for keywords in each string
+            if (argv[i][0] == '-') {
+
+                //Getting the variable name string without the hyphen deliminator
+                string str(argv[i]);
+                str = str.substr(1, str.length());
+
+                //CORNER CASE CHECK : for boolean variable
+                //check if the following string is another keyword
+                if (i + 1 == argc || argv[i + 1][0] == '-') {
+                    this->m[str] = "1";
+                } else {
+                    this->m[str] = argv[++i];
+                }
             }
-        }
-        //increment the loop counter
-        i++;
-    } while (i < argc);
+            //increment the loop counter
+            i++;
+        } while (i < argc);
+    }
+
 }
 
 /**
