@@ -17,29 +17,57 @@
 #include <cstdlib>
 #include <string>
 #include <map>
-
-#include "Variable.h"
-
-
-
-//needed only during the testing phase
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <sstream>
+
 
 using namespace std;
 
-class ArgumentParser {    
+class ArgumentParser {
 public:
-    ArgumentParser(int argc, char** argv);
-    void set(int *varToSet, char key);
-    void set(double *varToSet, char key);
-    void set(float *varToSet, char key);
-    void set(string *varToSet, char key);
+    ArgumentParser();
 
-private: 
-    //private helper methods
-    map<char, Variable*> separate(int argc, char** argv);    
-    map<char, Variable*> m;
+    void init();
+
+    void read(int arc, char **argv);
+
+    void addVar(string varName);
+
+    void rmVar(string varName);
+
+    //testing method
+    void test_showAll();
+
+    void set(string key, string val);
+
+    int getInt(string key);
+
+    float getFloat(string key);
+
+    double getDouble(string key);
+
+    string getString(string key);
+
+
+//    FOR TESTING: ADD A BOOL GETTER
+    bool getBool(string key);
+
+//    FOR TESTING: ADD AN OBJECT GETTER
+//    template<class T>
+//    T getObj(string key);
+
+
+private:
+    //private helpers
+    void separate(int argc, char **argv);
+
+    map<string, string> m;
+    istringstream sstream;
+
+    template<typename T>
+    T getVal(string key, T returnVal);
 };
 
 #endif /* ARGUMENTPARSER_H */
