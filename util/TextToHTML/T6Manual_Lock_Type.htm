@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+        <!DOCTYPE html
+          PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml"><head><meta xmlns="" http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>WLock Type</title><link rel="stylesheet" href="stylesheet.css" type="text/css"/>
+    
+        <div class="itemizedlist"><ul type="disc"><li>
+                    <p>Lock Type Information</p>
+    
+                    <div class="informaltable">
+                      <table border="1"><colgroup><col width="140" align="left"><col></colgroup><thead><tr><th align="left">Lock Type</th><th align="left">Description</th></tr></thead><tbody><tr><td align="left">WLOCK_MR</td><td><p>MEDIA RECOVERY 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_TX</td><td><p>TRANSACTION 사이의 Sync를 맞추기 위해 사용됨.</p></td></tr><tr><td align="left">WLOCK_SESS</td><td><p>세션이 열릴 때 사용됨. 열린 세션의 NORMAL MODE SHUTDOWN을 방지함.</p></td></tr><tr><td align="left">WLOCK_DML</td><td><p>일반적인 DML을 위해 사용됨.</p></td></tr><tr><td align="left">WLOCK_USER</td><td><p>USER가 세션을 열고 있을 때 DROP을 방지함.</p></td></tr><tr><td align="left">WLOCK_DD_*</td><td><p>DDL 발생 시 해당 SYS._DD_* 를 보호하기 위해 사용 (*: OBJ, USER, SGMT, TS, OBJAUTH, SYSAUTH, PSMIR, HISTOGRAM, DBLINK, AUX_STATS)</p></td></tr><tr><td align="left">WLOCK_SEQ_GET_NEXTVAL</td><td><p>SEQUENCE의 다음 값을 가져오는 데 사용됨.</p></td></tr><tr><td align="left">WLOCK_DDL_CREATE_TS</td><td><p>TABLE SPACE를 생성하는 DDL 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_DDL_CREATE_DF</td><td><p>DATA FILE을 생성하는 DDL 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_DDL_CREATE_CON</td><td><p>CONSTRAINT를 생성하는 DDL 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_RT</td><td><p>TAC 환경에서 한 인스턴스가 사용하는 REDO LOG GROUP의 집합인 REDO THREAD에 의해 사용됨.</p></td></tr><tr><td align="left">WLOCK_UNDO_TS</td><td><p>UNDO TABLESPACE 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_MV_RFSH</td><td><p>MATERIALIZED VIEW가 REFRESH 될 때 사용됨.</p></td></tr><tr><td align="left">WLOCK_XML</td><td><p>XML 관련 작업 수행 중 사용됨.</p></td></tr><tr><td align="left">WLOCK_STANDBY</td><td><p>TAC REPLICATION 중 CLEAR LOGFILE 과 PRIMARY 접속의 동기화 중 사용됨.</p></td></tr></tbody></table>
+                </div>
+              </li></ul></div>
