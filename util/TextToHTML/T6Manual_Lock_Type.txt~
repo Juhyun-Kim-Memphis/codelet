@@ -3,7 +3,7 @@ WLOCK_TX			TRANSACTION 사이의 Sync를 맞추기 위해 사용됨.
 WLOCK_SESS			세션이 열릴 때 사용됨. 열린 세션의 NORMAL MODE SHUTDOWN을 방지함.
 WLOCK_DML			일반적인 DML을 위해 사용됨.
 WLOCK_USER			USER가 세션을 열고 있을 때 DROP을 방지함.
-WLOCK_DD_*			DDL 발생 시 해당 SYS._DD_* 를 보호하기 위해 사용됨. (*: OBJ, USER, SGMT, TS, OBJAUTH, SYSAUTH, PSMIR, HISTOGRAM, DBLINK, AUX_STATS)
+WLOCK_DD_*			DDL 발생 시 해당 SYS._DD_* 를 보호하기 위해 사용 (*: OBJ, USER, SGMT, TS, OBJAUTH, SYSAUTH, PSMIR, HISTOGRAM, DBLINK, AUX_STATS)
 WLOCK_SEQ_GET_NEXTVAL		SEQUENCE의 다음 값을 가져오는 데 사용됨.
 WLOCK_DDL_CREATE_TS		TABLE SPACE를 생성하는 DDL 중 사용됨.
 WLOCK_DDL_CREATE_DF		DATA FILE을 생성하는 DDL 중 사용됨.
