@@ -23,13 +23,22 @@ YOURPASSWORD = "CHANGE_ME"
 
 #########################################################################
 
-# If no argument is given
+
+
+#########################################################################
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+###### NO NEED TO CHANGE BELOW THIS POINT TO SIMPLY USE THE SCRIPT ######
+#########################################################################
+
+# TODO: read timeout time from an argument
 if len(sys.argv) < 2:
-    #
-    os.system("sudo sed --in-place 's/env_reset/env_reset,timestamp_timeout=30/g' /etc/sudoers")
     commandString = "echo " + YOURPASSWORD + " | sudo -S false"
+    os.system("sudo sed --in-place 's/env_reset/env_reset,timestamp_timeout=30/g' /etc/sudoers")
     os.system(commandString)
-    print("PAWA GRANTED!")
     print("""
                  _..-...
               ,Y+  .:.:\_
@@ -64,37 +73,40 @@ if len(sys.argv) < 2:
     """)
 
 elif str(argv[1]) == "-r":
-    os.system("sudo sed --in-place 's/env_reset,timestamp_timeout=30/env_reset/g' /etc/sudoers")
-    os.system("sudo -k")
-    print('''
-        _ _,---._ 
-       ,-','       `-.___ 
-      /-;'               `._ 
-     /\/          ._   _,'o \ 
-    ( /\       _,--'\,','"`. ) 
-     |\      ,'o     \     //\ 
-     |      \        /   ,--'""`-. 
-     :       \_    _/ ,-'         `-._ 
-      \        `--'  /                ) 
-       `.  \`._    ,'     ________,',' 
-         .--`     ,'  ,--` __\___,;' 
-          \`.,-- ,' ,`_)--'  /`.,' 
-           \( ;  | | )      (`-/ 
-             `--'| |)       |-/     YOUR SUDO POWA HAS BEEN RESET
-               | | |        | |      YOUR SUDO POWA HAS BEEN RESET
-               | | |,.,-.   | |_      YOUR SUDO POWA HAS BEEN RESET
-               | `./ /   )---`  ) 
-              _|  /    ,',   ,-' 
-             ,'|_(    /-<._,' |--, 
-             |    `--'---.     \/ \ 
-             |          / \    /\  \ 
-           ,-^---._     |  \  /  \  \ 
-        ,-'        \----'   \/    \--`. 
-       /            \              \   \ 
-       ''')
+    if not os.geteuid() == 0:
+        sys.exit('YOU ARE NOT A ROOT')
+    else:
+        os.system("sudo sed --in-place 's/env_reset,timestamp_timeout=30/env_reset/g' /etc/sudoers")
+        os.system("sudo -k")
+        print('''
+            _ _,---._ 
+           ,-','       `-.___ 
+          /-;'               `._ 
+         /\/          ._   _,'o \ 
+        ( /\       _,--'\,','"`. ) 
+         |\      ,'o     \     //\ 
+         |      \        /   ,--'""`-. 
+         :       \_    _/ ,-'         `-._ 
+          \        `--'  /                ) 
+           `.  \`._    ,'     ________,',' 
+             .--`     ,'  ,--` __\___,;' 
+              \`.,-- ,' ,`_)--'  /`.,' 
+               \( ;  | | )      (`-/ 
+                 `--'| |)       |-/     YOUR SUDO POWA HAS BEEN RESET
+                   | | |        | |      YOUR SUDO POWA HAS BEEN RESET
+                   | | |,.,-.   | |_      YOUR SUDO POWA HAS BEEN RESET
+                   | `./ /   )---`  ) 
+                  _|  /    ,',   ,-' 
+                 ,'|_(    /-<._,' |--, 
+                 |    `--'---.     \/ \ 
+                 |          / \    /\  \ 
+               ,-^---._     |  \  /  \  \ 
+            ,-'        \----'   \/    \--`. 
+           /            \              \   \ 
+           ''')
 
 else:
-    print("PLEASE ENTER A CORRECT ARGUMENT OR NO ARGUMENT AT ALL")
+    sys.exit("PLEASE ENTER A CORRECT ARGUMENT OR NO ARGUMENT AT ALL")
 
 
 
