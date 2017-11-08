@@ -2,7 +2,7 @@
 
 __author__ = "HYUNSOO PARK"
 __email__ = "hyunsoo_park2@tmax.co.kr"
-__version__ = "2.0"
+__version__ = "3.0"
 __date__ = "2017-11-07"
 
 import os, sys
@@ -20,7 +20,11 @@ YOURPASSWORD = "CHANGE_ME"
 # 4. MAKE A SYMBOLIC LINK SO YOU DON'T HAVE TO TYPE THE FULL FILE NAME
 # FOR EXAMPLE, 'PAWA' WOULD PROMPT THE FILE IN THE FOLLOWING COMMAND
 # >sudo ln -s /usr/bin/pawa.py /usr/bin/PAWA
-
+#
+#5.  NOW, SIMPLY TYPE 'PAWA' TO GET SUDO FOR 30 MINUTES
+#
+#6.  TYPE 'PAWA -r' WILL RESET THE SUDO SETTINGS
+#
 #########################################################################
 
 
@@ -35,79 +39,75 @@ YOURPASSWORD = "CHANGE_ME"
 #########################################################################
 
 # TODO: read timeout time from an argument
-if len(sys.argv) < 2:
-    commandString = "echo " + YOURPASSWORD + " | sudo -S false"
-    os.system("sudo sed --in-place 's/env_reset/env_reset,timestamp_timeout=30/g' /etc/sudoers")
-    os.system(commandString)
+if len(sys.argv) == 1:
+    os.system("echo " + YOURPASSWORD + " | sudo -S false")
+    os.system("sudo sed -i '10iDefaults\tenv_reset,timestamp_timeout=30' /etc/sudoers")
+    os.system("sudo sed -i '11d' /etc/sudoers")
+
     print("""
-                 _..-...
-              ,Y+  .:.:\_
-             | |./'     ``-\.
-             |,'`           `.   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
-             |               `_   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
-             |     ,-''-. ,-''':   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
-             |    /      .'     :                                _
-             | .\ |    o  |__o.,'                           _.-'  \`
-            '|\|  \      /    `)                        ,..,'     ,'
-             |`|  ' `..- .....<:                      ,'    `. ,-:
-             ' ,-   _.-'        `.                 _,'       +'  |
-              |`|  ,'            '.              ,'       - _/_,'-\`
-               `.Y|   _,,.. ____./'           ,-'         /'|`'  _|
-                 ||  | |  |  | |           _.-              `--+'
-                 |-.  "|:.|..|-.    _,.. ,/'               ,..Y'
-                 / `\.       ,-'  ,' /,,'               _,'
-                .:_    -----'''|.:   |             _,Y''
-               /  '`'';'.     /:  \  |        _,Y-'
-               |      |  ' .  | `._| |     _,'
-           _/-'';.. _ |     ` |   \   `.Y'i'
-         ,'    ,'    '             |    i/'
-      ,.'      /                   ..--'
-      |       |                     \.
-      : .     /                      ' .
-     /'  `._ .'                         `.
-     /     _''                            \.
-    /     ./                               \.
-   /      /                                 \.
-  /      |                                   \.
- /     ,'|                                    |
+                    _..-...
+                  Y+  .:.:\_
+                  |./'     ``-\.
+                 ,'`           `.   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
+                |               `_   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
+                |     ,-''-. ,-''':   YOU NOW HAVE SUDO PAWA FOR 30 MINUTES
+                |    /      .'     :                                _
+                | .\ |    o  |__o.,'                           _.-'  \`
+               '|\|  \      /    `)                        ,..,'     ,'
+                |`|  ' `..- .....<:                      ,'    `. ,-:
+                ' ,-   _.-'        `.                 _,'       +'  |
+                 |`|  ,'            '.              ,'       - _/_,'-\`
+                  `.Y|   _,,.. ____./'           ,-'         /'|`'  _|
+                    ||  | |  |  | |           _.-              `--+'
+                    |-.  "|:.|..|-.    _,.. ,/'               ,..Y'
+                    / `\.       ,-'  ,' /,,'               _,'
+                   .:_    -----'''|.:   |             _,Y''
+                  /  '`'';'.     /:  \  |        _,Y-'
+                  |      |  ' .  | `._| |     _,'
+              _/-'';.. _ |     ` |   \   `.Y'i'
+            ,'    ,'    '             |    i/'
+         ,.'      /                   ..--'
+         |       |                     \.
+         : .     /                      ' .
+        /'  `._ .'                         `.
+        /     _''                            \.
+       /     ./                               \.
+      /      /                                 \.
+     /      |                                   \.
+    /     ,'|                                    |
     """)
 
+# TODO: Check whether the user already has sudo
 elif str(sys.argv[1]) == "-r":
-    if not os.geteuid() == 0:
-        sys.exit('YOU ARE NOT A ROOT')
-    else:
-        os.system("sudo sed --in-place 's/env_reset,timestamp_timeout=30/env_reset/g' /etc/sudoers")
-        os.system("sudo -k")
-        print('''
-            _ _,---._ 
-           ,-','       `-.___ 
-          /-;'               `._ 
-         /\/          ._   _,'o \ 
-        ( /\       _,--'\,','"`. ) 
-         |\      ,'o     \     //\ 
-         |      \        /   ,--'""`-. 
-         :       \_    _/ ,-'         `-._ 
-          \        `--'  /                ) 
-           `.  \`._    ,'     ________,',' 
-             .--`     ,'  ,--` __\___,;' 
-              \`.,-- ,' ,`_)--'  /`.,' 
-               \( ;  | | )      (`-/ 
-                 `--'| |)       |-/     YOUR SUDO POWA HAS BEEN RESET
-                   | | |        | |      YOUR SUDO POWA HAS BEEN RESET
-                   | | |,.,-.   | |_      YOUR SUDO POWA HAS BEEN RESET
-                   | `./ /   )---`  ) 
-                  _|  /    ,',   ,-' 
-                 ,'|_(    /-<._,' |--, 
-                 |    `--'---.     \/ \ 
-                 |          / \    /\  \ 
-               ,-^---._     |  \  /  \  \ 
-            ,-'        \----'   \/    \--`. 
-           /            \              \   \ 
-           ''')
+    os.system("sudo sed -i '10iDefaults\tenv_reset' /etc/sudoers")
+    os.system("sudo sed -i '11d' /etc/sudoers")
+    os.system("sudo -k")
+    print('''
+        _ _,---._ 
+       ,-','       `-.___ 
+      /-;'               `._ 
+     /\/          ._   _,'o \ 
+    ( /\       _,--'\,','"`. ) 
+     |\      ,'o     \     //\ 
+     |      \        /   ,--'""`-. 
+     :       \_    _/ ,-'         `-._ 
+      \        `--'  /                ) 
+       `.  \`._    ,'     ________,',' 
+         .--`     ,'  ,--` __\___,;' 
+          \`.,-- ,' ,`_)--'  /`.,' 
+           \( ;  | | )      (`-/ 
+             `--'| |)       |-/     YOUR SUDO PAWA HAS BEEN RESET
+               | | |        | |      YOUR SUDO PAWA HAS BEEN RESET
+               | | |,.,-.   | |_      YOUR SUDO PAWA HAS BEEN RESET
+               | `./ /   )---`  ) 
+              _|  /    ,',   ,-' 
+             ,'|_(    /-<._,' |--, 
+             |    `--'---.     \/ \ 
+             |          / \    /\  \ 
+           ,-^---._     |  \  /  \  \ 
+        ,-'        \----'   \/    \--`. 
+       /            \              \   \ 
+       ''')
 
 else:
     sys.exit("PLEASE ENTER A CORRECT ARGUMENT OR NO ARGUMENT AT ALL")
-
-
-
-
