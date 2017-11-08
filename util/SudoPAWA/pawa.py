@@ -72,7 +72,7 @@ if len(sys.argv) < 2:
  /     ,'|                                    |
     """)
 
-elif str(argv[1]) == "-r":
+elif str(sys.argv[1]) == "-r":
     if not os.geteuid() == 0:
         sys.exit('YOU ARE NOT A ROOT')
     else:
