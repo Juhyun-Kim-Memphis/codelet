@@ -51,7 +51,7 @@ def run():
     # If this script is still in the arguments, it means that the argument was given as '*'
     if this_script in sys.argv:
         # Get the list of files in the current directory, excluding this very script and other temp files denoted by '~'
-        files = [f for f in os.listdir('.') if os.path.isfile(f) and '~' not in f and script not in f]
+        files = [f for f in os.listdir('.') if os.path.isfile(f) and '~' not in f and this_script not in f]
         for num in range(0, len(files)):
             dump_path = files[num]
             # Add up all dat fat bytes yo
