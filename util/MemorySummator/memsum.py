@@ -1,6 +1,6 @@
 __author__ = "HYUNSOO PARK"
 __email__ = "hyunsoo_park2@tmax.co.kr"
-__version__ = "3.0"
+__version__ = "1.4"
 __date__ = "2017-11-15"
 
 import os, sys, operator
@@ -11,13 +11,16 @@ def helper(semi_total, dump_path, most):
     print("\nReading file: " + dump_path)
 
     # Open the file from the given path
-    txt_file = open(dump_path, "r")
+    dump_file = open(dump_path, "r")
 
     # Declare and initialize (optional) a line number variable
     linenum = 0
 
+    # Reset the semi-total memory
+    semi_total = 0
+
     # Iteratring through the file in line by line
-    for l in txt_file:
+    for l in dump_file:
         linenum += 1
         if "bytes are allocated in total" in l:
             # Remove the leading white space, then split the string by the first space
@@ -96,10 +99,14 @@ def run():
     # If this script is still in the arguments, it means that the argument was given as '*'
     if this_script in sys.argv:
         # Get the list of files in the current directory, excluding this very script and other temp files denoted by '~'
-        files = [f for f in os.listdir('.') if os.path.isfile(f) and '~' not in f and this_script not in f]
+        files = [f for f in os.listdir('.') if os.path.isfile(f) and '~' not in f and this_script not in f and '.trc' in f]
     # If files are given from the arguments
     else:
         files = [f for f in sys.argv]
+
+    if len(files) == 0:
+        print("[ERROR] NO MEMORY DUMP FILES DETECTED IN THE DIRECTORY")
+        exit()
 
     most = {}
     for num in range(0, len(files)):
@@ -109,7 +116,19 @@ def run():
 
     # Making a sorted representaton of the dictionary
     sorted_most = sorted(most.items(), key=operator.itemgetter(1), reverse=True)
+
+
+    # If the sorted list of tuples's length is smaller than the user's desired top number of codes
+    n = len(sorted_most)
+    not_enough = ""
+    if n < top:
+        top = n
+        not_enough = "\n[WARNING]\nThere are only " + str(n) + " codes in the processed dump file(s), " \
+                                                             "\nPrinting only top " + str(n) + " results."
+
+    print(not_enough)
     print("\n---List of codes sorted by most memory usage---\n")
+
     for num in range(0, top):
         print(
             str(num + 1) + ": " + sorted_most[num][0] + " is using " + str(sorted_most[num][1]) + " bytes" + " (="
