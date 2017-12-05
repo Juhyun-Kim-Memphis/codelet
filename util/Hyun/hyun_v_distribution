@@ -188,10 +188,8 @@ function buildall()
 				continue
 			fi
 		BUILD_CHECK=0
-		echo "debug 1"
 		#calling build() for each branch
 		build ${PATHS_ARRAY[$i]%"tbenv"}
-		echo "debug 2"
 		#if built succesfully, put the branch name 
 		#in the success array, and vice versa
 		if [ $BUILD_CHECK == 0 ]	
