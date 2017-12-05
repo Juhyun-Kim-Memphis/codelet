@@ -2,8 +2,25 @@
 
 ### author	= "HYUNSOO PARK"
 ### email	= "hyunsoo_park2@tmax.co.kr"
-### version	= "distribution.1.0"
+### version	= "distribution.1.1"
 ### date	= "2017-12-05"
+
+########################################################
+#						       #
+#		INITIAL SET UP - HOW TO		       #
+#						       #
+# 1. Download this script			       #
+#						       #
+# 2. Put this script inside of $HOME/bin/	       #
+#						       #
+# 3. Change the following variables' values below      #
+#						       #
+# 4. vi $HOME/.bashrc -> then add ". thisscriptname"   #
+#    at the end of the file -> wq!		       #
+#						       #
+# 5. Launch a new terminal, then all set!	       #
+#						       #
+########################################################
 
 ########################################################
 #						       #
@@ -15,6 +32,37 @@
 MAIN_DIR="$HOME/tibero"
 FIVE_PATCH_DIR="$MAIN_DIR/patches/5/patch"
 SIX_PATCH_DIR="$MAIN_DIR/patches/6/patch"
+
+########################################################
+#						       #
+#		    AVAILABLE COMMANDS		       #
+#						       #
+# [IN THE DIRECTORY WITH 'tbenv']		       #
+# 1. 	$ hevn					       #
+#    	run tbenv with SID of 'tibero'		       #
+# 1.a   $ hevn somename				       #
+#    	run tbenv with SID of 'somename'	       #
+#						       #
+# 2.    $ build					       #
+#	build the branch for ya!		       #
+#						       #
+# 3.	$ hpatch tiberoversion patchfilename	       #
+#	ex) $ hpatch 6 FS05_CS_131451a		       #
+#	if you set up the above variables correctly,   #
+#	the command = patch -p0 < 6/patch/FS05_CS...   #
+#						       #
+# [IN ONE OF THE TIBERO BRAHNCH DIRECTORIES]	       #
+# 4.	$ up					       #
+#	= svn up .				       #
+# 						       #
+# 5.	$ revert				       #
+#	= svn revert -R .			       #
+#						       #
+# [IN THE DIRECTORY WITH ALL OF THE TIBERO BRANCHES    #
+# 6.	$ buildall				       #
+#	build every branch in the directory for you    #
+#						       #
+########################################################
 
 #################################################################               
 #                                                               #               
@@ -91,7 +139,8 @@ function buildall()
 	for ((i=0;i<=LENGTH;i++));                                              
                 do
 		
-		#########################################################              	            #       Skip Tibero 7 from the branches to build        #
+		#########################################################
+                #       Skip Tibero 7 from the branches to build        #
 		#########################################################
 			if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
 			then	
@@ -363,7 +412,7 @@ function link_prebuilt()
 ARGC="$#"
 if [ $ARGC -eq 0 ]
 	then
-		echo "!!---ERROR---!! [NO ARGUMENT GIVEN]"
+		echo "!!---HYUN SCRIPT DISTRIBUTION VERSION 1.1---!!"
 else
 	OPTION="${1}"                                                   
         case ${OPTION} in                                               
