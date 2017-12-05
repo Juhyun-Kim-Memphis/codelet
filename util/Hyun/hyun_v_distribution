@@ -118,7 +118,24 @@ function buildall()
                 Y=1                                                     
         else                                                            
                 return 1                                                
-        fi                    
+        fi
+
+        #svn password warning
+        echo $'\n'$'\n'"!!---WARNING---!! [FOR THE BEST BUILD OUTCOME, THIS COMMAND REQUIRES SVN PASSWORD SAVE ACTIVATED TEMPORARILY]"
+        echo "[IT WILL BE REVERTED BACK TO ORIGINAL SETTING ONCE BUILD PROCEDURE IS COMPLETED. IS IT OKAY?]"
+        get_consent
+        if [ $Y == 0 ]
+        then
+            #resetting the flag
+            Y=1
+            
+            #change the svn setting
+            sed -i -e 's/# store-passwords = no/store-passwords = yes/g' $HOME/.subversion/servers
+            sed -i -e 's/# store-plaintext-passwords = no/store-plaintext-passwords = yes/g' $HOME/.subversion/servers
+        else
+            #terminate the build all process
+            return 1
+        fi
 
 	#counter for build success and failure
 	SUCCESS_COUNT=0                                                         
@@ -212,6 +229,10 @@ function buildall()
 			echo "${FAIL[$i]}"
 		done           
 	fi
+        
+        #resetting the svn setting
+        sed -i -e 's/store-passwords = yes/# store-passwords = no/g' $HOME/.subversion/servers
+        sed -i -e 's/store-plaintext-passwords = yes/# store-plaintext-passwords = no/g' $HOME/.subversion/servers
 
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE COMPLETED]"
 }
@@ -289,13 +310,13 @@ function build()
 	#build then store the output into a temp file "failed_build_log"
 	#search "failed" in the log
 	#if it does not exist, remove the temp log file
-	if grep -Fxq "BUILD FAILED" ../failed_build_log
+	if grep -Fxq "BUILD FAILED" failed_build_log
 	then
 		echo $'\n'$'\n'"!!---ERROR---!! [BUILD FAILED: SEE failed_build_log]"
-		$BUILD_CHECK=1
+		BUILD_CHECK=1
 	else
 		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD SUCCESSFUL]"
-		$BUILD_CHECK=0
+		BUILD_CHECK=0
 		rm failed_build_log
 	fi
 }
