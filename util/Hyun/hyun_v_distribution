@@ -51,7 +51,7 @@ SIX_PATCH_DIR="$MAIN_DIR/patches/6/patch"
 #	if you set up the above variables correctly,   #
 #	the command = patch -p0 < 6/patch/FS05_CS...   #
 #						       #
-# [IN ONE OF THE TIBERO BRAHNCH DIRECTORIES]	       #
+# [IN ONE OF THE TIBERO BRANCH DIRECTORIES]	       #
 # 4.	$ up					       #
 #	= svn up .				       #
 # 						       #
@@ -357,8 +357,6 @@ function jamrules()
 	fi
 
 	cp Jamrules.local.eg Jamrules.local
-	ORIG="# DEFS_ADD += -D_DONT_CHECK_LICENSE ;"
-	NEW="DEFS_ADD += -D_DONT_CHECK_LICENSE ;"
 	sed -i -e 's/# DEFS_ADD += -D_DONT_CHECK_LICENSE/DEFS_ADD += -D_DONT_CHECK_LICENSE/g' Jamrules.local
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Jamrules.local edited]"
 	cd ..
@@ -404,31 +402,3 @@ function link_prebuilt()
 	fi
 	cd ..
 }
-
-
-#######################################
-#	MAIN PART OF THE SCRIPT	      #
-#######################################
-ARGC="$#"
-if [ $ARGC -eq 0 ]
-	then
-		echo "!!---HYUN SCRIPT DISTRIBUTION VERSION 1.1---!!"
-else
-	OPTION="${1}"                                                   
-        case ${OPTION} in                                               
-        "henv") henv $2
-	;;
-	"build") build
-	;;
-	"revert") revert
-	;;
-	"up") up
-	;;
-	"buildall") buildall
-	;;
-	"hpatch") hpatch $2 $3
-	;;
-	*) echo $'\n'$'\n'"!!---ERROR---!! [INVALID ARGUMENT]"  
-        esac     
-fi
-
