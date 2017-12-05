@@ -377,8 +377,6 @@ else
 	;;
 	"buildall") buildall
 	;;
-	"go") go $2 $3 $4
-	;;
 	"hpatch") hpatch $2 $3
 	;;
 	*) echo $'\n'$'\n'"!!---ERROR---!! [INVALID ARGUMENT]"  
