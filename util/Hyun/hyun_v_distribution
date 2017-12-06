@@ -2,7 +2,7 @@
 
 ### author	= "HYUNSOO PARK"
 ### email	= "hyunsoo_park2@tmax.co.kr"
-### version	= "distribution.1.2"
+### version	= "distribution.1.4"
 ### date	= "2017-12-05"
 
 ########################################################
@@ -77,7 +77,7 @@ function get_consent()
         if [ "$RESPONSE" == "Y" ] || [ "$RESPONSE" == "y" ]; then               
                 Y=0                                                             
         else                                                                    
-                echo $'\n'$'\n'"!!---WARNING---!! [PROCEDURE ABORTED]"          
+                echo $'\n'$'\n'"!!---PROGRESS LOG---!! [CANCELLED]"          
                 Y=1                                                             
         fi                                                                      
 }     
@@ -108,39 +108,12 @@ function hpatch()
 
 function buildall()
 {
-	#revert warning
-	echo $'\n'$'\n'"!!---WARNING---!! [THIS WILL REVERT EVERYTHING! IS IT OKAY?]"
-	get_consent                                                  
-        if [ $Y == 0 ]                                                  
-        then                                                            
-		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"   
-		#resetting the flag                                     
-                Y=1                                                     
-        else                                                            
-                return 1                                                
-        fi
-
-        #svn password warning
-        echo $'\n'$'\n'"!!---WARNING---!! [FOR THE BEST BUILD OUTCOME, THIS COMMAND REQUIRES SVN PASSWORD SAVE ACTIVATED TEMPORARILY]"
-        echo "[IT WILL BE REVERTED BACK TO ORIGINAL SETTING ONCE BUILD PROCEDURE IS COMPLETED. IS IT OKAY?]"
-        get_consent
-        if [ $Y == 0 ]
-        then
-            #resetting the flag
-            Y=1
-            
-            #change the svn setting
-            sed -i -e 's/# store-passwords = no/store-passwords = yes/g' $HOME/.subversion/servers
-            sed -i -e 's/# store-plaintext-passwords = no/store-plaintext-passwords = yes/g' $HOME/.subversion/servers
-        else
-            #terminate the build all process
-            return 1
-        fi
-
 	#counter for build success and failure
 	SUCCESS_COUNT=0                                                         
 	FAIL_COUNT=0    
 
+	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [SEARCHING FOR BRANCHES TO BUILD (this could take several minutes)]"
 	#find all locations of tbevn script in the parent directory
 	PATHS=$(find -L $MAIN_DIR -name tbenv)
        
@@ -151,33 +124,81 @@ function buildall()
         LENGTH=${#PATHS_ARRAY[*]}                                                     
         ((LENGTH--))                                                            
 
+	#index of the array keeping indices of branches to skip
+	SKIP_COUNTER=0
+
 	#check detected branches
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Following branches detected]"
 	for ((i=0;i<=LENGTH;i++));                                              
-                do
-		
+        do		
 		#########################################################
                 #       Skip Tibero 7 from the branches to build        #
 		#########################################################
-			if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
-			then	
-				echo "... Tibero 7 detected, skipping the branch"
-				continue
-			fi
-			#remove "tbenv" at the end of the path
-                        echo ${PATHS_ARRAY[$i]%"tbenv"}
-		done
+		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
+		then	
+			SKIP[SKIP_COUNTER]=$i
+			((SKIP_COUNTER++))
+			echo "$i": Tibero 7 detected, skipping the branch...
+			continue
+		fi
+		#remove "tbenv" at the end of the path
+                echo "$i": ${PATHS_ARRAY[$i]%"tbenv"}
+	done
+	
+	#TODO: ASK USER TO SKIP CERTAIN BRANCH
+	#echo $'\n'"(TYPE 'Y' OR 'y' TO PROCEED)"                                
+        #read RESPONSE                                                           
+        #if [ "$RESPONSE" == "Y" ] || [ "$RESPONSE" == "y" ]; then               
+        #        Y=0                                                             
+        #else                                                                    
+        #        echo $'\n'$'\n'"!!---WARNING---!! [PROCEDURE ABORTED]"          
+        #        Y=1                                                             
+        #fi
+
 	get_consent
-	if [ $Y == 0 ]                                                          
-        then                                                                    
-                echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"           
-                #resetting the flag                                             
-                Y=1                                                             
-        else                                                                    
-                return 1                                                        
-        fi  
+	if [ $Y == 1 ]                                                          
+        then		
+		return 1
+	else
+		#resetting the flag
+		Y=1
+	fi                                                                    
+
+	######################################################################
+	#[2017-12-06] svn up conflict was found to be capable of stopping the#
+	#building process when there is a merge conflict. pulling the revert #
+	#and up process at the beginning of the buildall procedure.          #
+	######################################################################
+	for ((i=0;i<=LENGTH;i++));                                              
+        do      
+		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]                         
+                then
+			continue
+		fi 
+		#revert warning
+		echo $'\n'$'\n'"!!---WARNING---!! [REVERT & UPDATE BRANCH: ${PATHS_ARRAY[$i]%"tbenv"}]"
+		cd ${PATHS_ARRAY[$i]%"tbenv"}		
+		
+		get_consent                                                  
+	        if [ $Y == 0 ]                                                  
+	        then                                                            
+			revert
+			up
+			#resetting the flag                                     
+	                Y=1                                                     
+	        else                                                            
+	                continue                                                
+	        fi
+	done  
 
 	#start building process	
+	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+	echo "!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+        echo "!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+	echo "!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+	echo "!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
+	echo $'\n'$'\n'"!!---WARNING---!! [IT IS HIGHLY RECOMMENDED TO LEAVE THIS TERMINAL ALONE FROM THIS POINT]"
+           
 	for ((i=0;i<=LENGTH;i++));                                              
         do
 		#########################################################              	  
@@ -228,10 +249,6 @@ function buildall()
 		done           
 	fi
         
-        #resetting the svn setting
-        sed -i -e 's/store-passwords = yes/# store-passwords = no/g' $HOME/.subversion/servers
-        sed -i -e 's/store-plaintext-passwords = yes/# store-plaintext-passwords = no/g' $HOME/.subversion/servers
-
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE COMPLETED]"
 }
 
@@ -279,8 +296,13 @@ function build()
 		return 1
 	fi
 	
-	revert
-	up
+	#If this function is called from buildall(), the branch has already
+	#gone through revert and update process
+	if [ -z "$1" ]                                                        
+        then 
+		revert
+		up
+	fi
 	
 	jamrules
 	if [ $ERROR_CHECK == 1 ]
