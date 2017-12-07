@@ -2,7 +2,7 @@
 
 ### author	= "HYUNSOO PARK"
 ### email	= "hyunsoo_park2@tmax.co.kr"
-### version	= "distribution.1.4"
+### version	= "distribution.1.5"
 ### date	= "2017-12-05"
 
 ########################################################
@@ -50,6 +50,9 @@ SIX_PATCH_DIR="$MAIN_DIR/patches/6/patch"
 #	ex) $ hpatch 6 FS05_CS_131451a		       #
 #	if you set up the above variables correctly,   #
 #	the command = patch -p0 < 6/patch/FS05_CS...   #
+#	                                               #
+# 4.    $ newmount                                     #
+#       mount a new DB for ya!                         #
 #						       #
 # [IN ONE OF THE TIBERO BRANCH DIRECTORIES]	       #
 # 4.	$ up					       #
@@ -443,3 +446,34 @@ function link_prebuilt()
 	fi
 	cd ..
 }
+
+#instance making
+function newmount(){
+        if [ -z ${TB_SID} ]
+        then
+            echo $'\n'$'\n'"!!---ERROR---!! [TB_SID not detected: Please run 'henv' command first]"
+            return 1
+        fi
+
+        cd config
+        if [ ! -f ${TB_SID}.tip ]
+        then
+            echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Generating tip file]"
+            ./gen_tip
+        else
+            echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Tip file already exists: ${TB_SID}.tip ]"
+        fi
+
+        echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Changing the listener port to 8629]"
+
+        sed -i -e 's/#LISTENER_PORT=@PORT@/LISTENER_PORT=8629/g' ${TB_SID}.tip
+        
+        cd ../src/scripts
+        echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Mounting a new DB]"
+        ./tb_newmount.sh
+
+        cd ../..
+        echo $'\n'$'\n'"!!---PROGRESS LOG---!! [DB Newmount completed]"        
+}
+
+
