@@ -255,7 +255,6 @@ function buildall()
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE COMPLETED]"
 }
 
-
 function build()
 {
 	ERROR_CHECK=0
@@ -321,12 +320,22 @@ function build()
 
 	jamtool
 
+        #skipping client parts' dumb code that never seems to build- ever.
+        mv src/client/tbcreatedb/Jamfile src/client/tbcreatedb/skipme
+        mv src/client/tbepa/java/Jamfile src/client/tbepa/java/skipme
+        mv src/client/tbjdbc/Jamfile src/client/tbjdbc/skipme
+
 	cd src
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [FIRST jam -j9 started]"	
 	jam -j9 > ../failed_build_log
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [SECOND jam -j9 started]"  
 	jam -j9 > ../failed_build_log
 	cd ..
+
+        #reverting dumb skipped files
+        mv src/client/tbcreatedb/skipme src/client/tbcreatedb/Jamfile
+        mv src/client/tbepa/java/skipme src/client/tbepa/java/Jamfile
+        mv src/client/tbjdbc/skipme src/client/tbjdbc/Jamfile
 
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE COMPLETED]"
 
@@ -343,8 +352,6 @@ function build()
 		rm failed_build_log
 	fi
 }
-
-
 
 #setting the path to prebuilt directory
 function set_prebuilt()
@@ -475,5 +482,4 @@ function newmount(){
         cd ../..
         echo $'\n'$'\n'"!!---PROGRESS LOG---!! [DB Newmount completed]"        
 }
-
 
