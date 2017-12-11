@@ -2,7 +2,7 @@
 
 ### author	= "HYUNSOO PARK"
 ### email	= "hyunsoo_park2@tmax.co.kr"
-### version	= "distribution.1.6"
+### version	= "distribution.2.0"
 ### date	= "2017-12-05"
 
 ########################################################
@@ -80,7 +80,6 @@ function get_consent()
         if [ "$RESPONSE" == "Y" ] || [ "$RESPONSE" == "y" ]; then               
                 Y=0                                                             
         else                                                                    
-                echo $'\n'$'\n'"!!---PROGRESS LOG---!! [CANCELLED]"          
                 Y=1                                                             
         fi                                                                      
 }     
@@ -109,6 +108,110 @@ function hpatch()
 	patch -p 0 < $PATH_TO_PATCH_FILE
 }
 
+#helper functon for the buildall procedure
+function printBranchesGetSkip(){
+
+        #index of the array keeping indices of branches to skip
+	SKIP_COUNTER=0
+
+        #flag to mark the point when user is done with registering branches to skip to build
+        SKIP_DONE=1
+
+
+        #########################################################
+        #       Skip Tibero 7 from the branches to build        #
+        #########################################################
+        for ((i=0;i<=LENGTH;i++));
+        do
+            if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
+            then
+                SKIP[$SKIP_COUNTER]=$i
+                ((SKIP_COUNTER++))
+            fi
+        done
+
+        while [ $SKIP_DONE == 1 ]
+        do
+	    BRANCH_COUNT=0
+            #check detected branches
+            echo $'\n'$'\n'"!!---PROGRESS LOG---!! [LIST OF BRANCHES TO BUILD]"
+	    for ((i=0;i<=LENGTH;i++));                                              
+            do		
+		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
+		then
+			BRANCHES[$BRANCH_COUNT]="[X] "$i": ${PATHS_ARRAY[$i]%"tbenv"} >>> Automatically skipping Tibero 7"
+			((BRANCH_COUNT++))
+			continue
+		fi
+
+		LOOP_CONTROL=$SKIP_COUNTER
+                for ((k=0;k<$LOOP_CONTROL;k++))
+                do
+			SKIP_VAL="O"
+        	        if [ "${SKIP[$k]}" == "$i" ]
+                        then
+				SKIP_VAL="X"
+				break
+                        fi
+                done
+		BRANCHES[BRANCH_COUNT]="[$SKIP_VAL] "$i": ${PATHS_ARRAY[$i]%"tbenv"}"
+		((BRANCH_COUNT++))
+	    done
+
+	    printf '%s\n' "${BRANCHES[@]}"
+
+            echo $'\n'$'\n'"Enter the number of the branch on the list you wish to skip in buidling procedure"
+            echo "Type \"done\" when you are done and wish to start the procedure"
+            
+            read SKIP_RESPONSE
+            
+            if [ $SKIP_RESPONSE == "done" ]
+            then
+                #get out of the skipping loop
+                SKIP_DONE=0
+            else
+                # if [[ -z "$SKIP_RESPONSE" || $SKIP_RESPONSE == *[^[:digit:]]* ]]
+                if [[ ! $SKIP_RESPONSE =~ ^[0-9]+$ ]]
+                then
+                    #user input is not a number
+                    echo "!!---ERROR---!! [Please enter a number on the list above]"
+                #I KNOW THIS LOOKS WEIRD BUT IT'S BECAUSE BASH SYNTAX IS FUCKED UP.
+                elif [ $(($SKIP_RESPONSE - $LENGTH)) -gt 0 ]
+                then
+                    #user input is out of the range
+                    echo "!!---ERROR---!! [Please enter a number on the list above]"
+                else
+                    UNSKIP=0
+                    LOOP_CONTROL=$SKIP_COUNTER
+                    for ((j=0;j<$LOOP_CONTROL;j++))
+                    do
+                        if [ "${SKIP[$j]}" == "$SKIP_RESPONSE" ]
+                        then
+			    #check T7 unskip
+			    if [[ "${PATHS_ARRAY[${SKIP[$j]}]}" = *"/7/"* ]]
+			    then
+				echo "!!---WARNING---!! [YOU CANNOT UNSKIP T7]"
+			    else
+				echo "UNskipping "${SKIP[$j]}": ${PATHS_ARRAY[${SKIP[$j]}]%"tbenv"}"
+                            	unset SKIP[$j]
+                            	SKIP=( "${SKIP[@]}" )
+                            	((SKIP_COUNTER--))
+                            	UNSKIP=1
+			    fi
+                        fi
+                    done
+                   
+                    if [ ! $UNSKIP == 1 ]
+                    then
+                        echo "Skipping "$SKIP_RESPONSE": ${PATHS_ARRAY[$SKIP_RESPONSE]%"tbenv"}"
+                        SKIP[$SKIP_COUNTER]=$SKIP_RESPONSE
+                        ((SKIP_COUNTER++))
+                    fi
+                fi
+            fi
+	done
+}
+
 function buildall()
 {
 	#counter for build success and failure
@@ -127,45 +230,7 @@ function buildall()
         LENGTH=${#PATHS_ARRAY[*]}                                                     
         ((LENGTH--))                                                            
 
-	#index of the array keeping indices of branches to skip
-	SKIP_COUNTER=0
-
-	#check detected branches
-	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [Following branches detected]"
-	for ((i=0;i<=LENGTH;i++));                                              
-        do		
-		#########################################################
-                #       Skip Tibero 7 from the branches to build        #
-		#########################################################
-		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
-		then	
-			SKIP[SKIP_COUNTER]=$i
-			((SKIP_COUNTER++))
-			echo "$i": Tibero 7 detected, skipping the branch...
-			continue
-		fi
-		#remove "tbenv" at the end of the path
-                echo "$i": ${PATHS_ARRAY[$i]%"tbenv"}
-	done
-	
-	#TODO: ASK USER TO SKIP CERTAIN BRANCH
-	#echo $'\n'"(TYPE 'Y' OR 'y' TO PROCEED)"                                
-        #read RESPONSE                                                           
-        #if [ "$RESPONSE" == "Y" ] || [ "$RESPONSE" == "y" ]; then               
-        #        Y=0                                                             
-        #else                                                                    
-        #        echo $'\n'$'\n'"!!---WARNING---!! [PROCEDURE ABORTED]"          
-        #        Y=1                                                             
-        #fi
-
-	get_consent
-	if [ $Y == 1 ]                                                          
-        then		
-		return 1
-	else
-		#resetting the flag
-		Y=1
-	fi                                                                    
+        printBranchesGetSkip
 
 	######################################################################
 	#[2017-12-06] svn up conflict was found to be capable of stopping the#
@@ -174,10 +239,29 @@ function buildall()
 	######################################################################
 	for ((i=0;i<=LENGTH;i++));                                              
         do      
+		#T7 check
 		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]                         
                 then
 			continue
-		fi 
+		fi
+
+		#skip branch check
+		SKIP_CHECK="N"
+		LOOP_CONTROL=$SKIP_COUNTER
+                for ((k=0;k<$LOOP_CONTROL;k++))
+                do
+                        if [ "${SKIP[$k]}" == "$i" ]
+                        then
+                                SKIP_CHECK="Y"
+                                break
+                        fi
+                done
+		
+		if [ "$SKIP_CHECK" == "Y" ]
+		then
+			continue
+		fi
+
 		#revert warning
 		echo $'\n'$'\n'"!!---WARNING---!! [REVERT & UPDATE BRANCH: ${PATHS_ARRAY[$i]%"tbenv"}]"
 		cd ${PATHS_ARRAY[$i]%"tbenv"}		
@@ -207,10 +291,28 @@ function buildall()
 		#########################################################              	  
 		#       Skip Tibero 7 from the branches to build        #
 		#########################################################
-			if [[ ${PATHS_ARRAY[$i]} == *"/7/"* ]]
-			then
-				continue
-			fi
+		if [[ ${PATHS_ARRAY[$i]} == *"/7/"* ]]
+		then
+			continue
+		fi
+
+		#skip branch check
+                SKIP_CHECK="N"
+                LOOP_CONTROL=$SKIP_COUNTER
+                for ((k=0;k<$LOOP_CONTROL;k++))
+                do
+                        if [ "${SKIP[$k]}" == "$i" ]
+                        then
+                                SKIP_CHECK="Y"
+                                break
+                        fi
+                done
+                
+                if [ "$SKIP_CHECK" == "Y" ]
+                then
+                        continue
+                fi
+
 		BUILD_CHECK=0
 		#calling build() for each branch
 		build ${PATHS_ARRAY[$i]%"tbenv"}
@@ -265,16 +367,11 @@ function build()
 		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started for branch: $1]"
 	else
 		#revert warning for single build
-		echo $'\n'$'\n'"!!---WARNING---!! [THIS WILL REVERT EVERYTHING! IS IT OKAY?]"
+		echo $'\n'$'\n'"!!---WARNING---!! [REVERT THE BRANCH?]"
+
+                #for reverting
 		get_consent
-		if [ $Y == 0 ]
-		then 
-			echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"
-			#resetting the flag
-			Y=1
-		else
-			return 1
-		fi
+		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"
 	fi
 
 	#check if this is a correct directory
@@ -302,7 +399,12 @@ function build()
 	#gone through revert and update process
 	if [ -z "$1" ]                                                        
         then 
-		revert
+		if [ $Y == 0 ]
+                then
+                    revert
+                    #resetting the consent flag
+                    Y=1
+                fi
 		up
 	fi
 	
