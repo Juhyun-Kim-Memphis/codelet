@@ -1,7 +1,9 @@
 #include <iostream>
+#include <gtest/gtest.h>
 
 class ButtonListener;
 class Dialer;
+int dialedDigit = 0; // just for checking
 
 /* Client */
 class Button
@@ -40,16 +42,15 @@ void ButtonDialerAdapter::buttonPressed() {
 }
 
 void Dialer::digit(int n){
-    std::cout<< n <<std::endl;
+    // std::cout<< n <<std::endl;
+    dialedDigit = n;
 }
 
-int main(int argc, char const *argv[])
-{
+TEST(TaskGoF, testIfDigitIsDialed) {
     Dialer dialer;
     ButtonDialerAdapter *bda = new ButtonDialerAdapter(&dialer, 7);
     Button button(bda);
 
     button.listener->buttonPressed();
-
-    return 0;
+    EXPECT_EQ(dialedDigit , 7);
 }
