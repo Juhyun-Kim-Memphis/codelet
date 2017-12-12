@@ -130,11 +130,11 @@ function printBranchesGetSkip(){
             fi
         done
 
+	ERROR_MSG=""
+
         while [ $SKIP_DONE == 1 ]
         do
 	    BRANCH_COUNT=0
-            #check detected branches
-            echo $'\n'$'\n'"!!---PROGRESS LOG---!! [LIST OF BRANCHES TO BUILD]"
 	    for ((i=0;i<=LENGTH;i++));                                              
             do		
 		if [[ "${PATHS_ARRAY[$i]}" = *"/7/"* ]]
@@ -154,14 +154,29 @@ function printBranchesGetSkip(){
 				break
                         fi
                 done
+
+		#if there is nothing to skip initially
+		if [ $LOOP_CONTROL -eq 0 ]
+		then
+			SKIP_VAL="O"			
+		fi
+		
 		BRANCHES[BRANCH_COUNT]="[$SKIP_VAL] "$i": ${PATHS_ARRAY[$i]%"tbenv"}"
 		((BRANCH_COUNT++))
 	    done
 
+	    #clear the terminal screen first
+            clear
+ 	   
+	    #check detected branches
+            echo $'\n'$'\n'"[LIST OF BRANCHES TO BUILD]"
+ 
+	    #actually print out the list
 	    printf '%s\n' "${BRANCHES[@]}"
 
             echo $'\n'$'\n'"Enter the number of the branch on the list you wish to skip in buidling procedure"
             echo "Type \"done\" when you are done and wish to start the procedure"
+	    echo "$ERROR_MSG"
             
             read SKIP_RESPONSE
             
@@ -174,12 +189,12 @@ function printBranchesGetSkip(){
                 if [[ ! $SKIP_RESPONSE =~ ^[0-9]+$ ]]
                 then
                     #user input is not a number
-                    echo "!!---ERROR---!! [Please enter a number on the list above]"
+                    ERROR_MSG="!!---ERROR---!! [Please enter a number on the list above]"
                 #I KNOW THIS LOOKS WEIRD BUT IT'S BECAUSE BASH SYNTAX IS FUCKED UP.
                 elif [ $(($SKIP_RESPONSE - $LENGTH)) -gt 0 ]
                 then
                     #user input is out of the range
-                    echo "!!---ERROR---!! [Please enter a number on the list above]"
+                    ERROR_MSG="!!---ERROR---!! [Please enter a number on the list above]"
                 else
                     UNSKIP=0
                     LOOP_CONTROL=$SKIP_COUNTER
@@ -190,9 +205,9 @@ function printBranchesGetSkip(){
 			    #check T7 unskip
 			    if [[ "${PATHS_ARRAY[${SKIP[$j]}]}" = *"/7/"* ]]
 			    then
-				echo "!!---WARNING---!! [YOU CANNOT UNSKIP T7]"
+				ERROR_MSG="!!---WARNING---!! [YOU CANNOT UNSKIP T7]"
 			    else
-				echo "UNskipping "${SKIP[$j]}": ${PATHS_ARRAY[${SKIP[$j]}]%"tbenv"}"
+				ERROR_MSG="!!---PROGRESS LOG---!! [UNskipping "${SKIP[$j]}": ${PATHS_ARRAY[${SKIP[$j]}]%"tbenv"}]"
                             	unset SKIP[$j]
                             	SKIP=( "${SKIP[@]}" )
                             	((SKIP_COUNTER--))
@@ -203,7 +218,7 @@ function printBranchesGetSkip(){
                    
                     if [ ! $UNSKIP == 1 ]
                     then
-                        echo "Skipping "$SKIP_RESPONSE": ${PATHS_ARRAY[$SKIP_RESPONSE]%"tbenv"}"
+                        ERROR_MSG="!!---PROGRESS LOG---!! [Skipping "$SKIP_RESPONSE": ${PATHS_ARRAY[$SKIP_RESPONSE]%"tbenv"}]"
                         SKIP[$SKIP_COUNTER]=$SKIP_RESPONSE
                         ((SKIP_COUNTER++))
                     fi
@@ -229,6 +244,9 @@ function buildall()
 	#get the length of the array then decrement it by 1 for loop control
         LENGTH=${#PATHS_ARRAY[*]}                                                     
         ((LENGTH--))                                                            
+
+	#clear the terminal first
+	clear
 
         printBranchesGetSkip
 
@@ -273,10 +291,23 @@ function buildall()
 			up
 			#resetting the flag                                     
 	                Y=1                                                     
-	        else                                                            
+	        else
 	                continue                                                
 	        fi
 	done  
+
+	#clear the terminal
+	clear
+
+	echo $'\n'$'\n'"!!---WARNING---!! [START BUILDING ALL, OKAY?]"
+
+	get_consent
+        if [ $Y != 0 ]
+        then
+        	#resetting the flag                                     
+                Y=1
+		return 1
+        fi
 
 	#start building process	
 	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE STARTED]"
@@ -313,18 +344,17 @@ function buildall()
                         continue
                 fi
 
-		BUILD_CHECK=0
 		#calling build() for each branch
 		build ${PATHS_ARRAY[$i]%"tbenv"}
 		#if built succesfully, put the branch name 
 		#in the success array, and vice versa
 		if [ $BUILD_CHECK == 0 ]	
 		then
-			((SUCCESS_COUNT++))
 			SUCCESS[SUCCESS_COUNT]=${PATHS_ARRAY[$i]%"tbenv"}
+			((SUCCESS_COUNT++))
 		else
-			((FAIL_COUNT++))
 			FAIL[FAIL_COUNT]=${PATHS_ARRAY[$i]%"tbenv"}
+			((FAIL_COUNT++))
 		fi
         done     
         
@@ -332,7 +362,6 @@ function buildall()
 	if [ "$SUCCESS_COUNT" -gt 0 ]                                           
         then
 		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [LIST OF BRANCHES SUCCESSFULLY BUILT]"	
-
 		#each count works as a loop controller
 		((SUCCESS_COUNT--))
 		for ((i=0;i<=SUCCESS_COUNT;i++));			
@@ -360,6 +389,7 @@ function buildall()
 function build()
 {
 	ERROR_CHECK=0
+	BUILD_CHECK=0
 	
 	if [ ! -z "$1" ]
 	then
@@ -371,7 +401,15 @@ function build()
 
                 #for reverting
 		get_consent
-		echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"
+		if [ $Y != 0 ]
+                then
+			#exit			
+			return 1
+		else
+			echo $'\n'$'\n'"!!---PROGRESS LOG---!! [build started]"
+			#resetting the flag
+			Y=0
+		fi
 	fi
 
 	#check if this is a correct directory
@@ -411,12 +449,14 @@ function build()
 	jamrules
 	if [ $ERROR_CHECK == 1 ]
 	then
+		BUILD_CHECK=1
 		return 1
 	fi
 	
 	autoconf
 	if [ $ERROR_CHECK == 1 ]
 	then
+		BUILD_CHECK=1
 		return 1
 	fi
 
@@ -438,8 +478,6 @@ function build()
         mv src/client/tbcreatedb/skipme src/client/tbcreatedb/Jamfile
         mv src/client/tbepa/java/skipme src/client/tbepa/java/Jamfile
         mv src/client/tbjdbc/skipme src/client/tbjdbc/Jamfile
-
-	echo $'\n'$'\n'"!!---PROGRESS LOG---!! [BUILD ALL PROCEDURE COMPLETED]"
 
 	#build then store the output into a temp file "failed_build_log"
 	#search "failed" in the log
