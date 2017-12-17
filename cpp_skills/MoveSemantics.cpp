@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <memory>
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -10,10 +11,11 @@ public:
     char *data;
     char name{};
     int id;
+    const int ONE_MEGA_BYTE = 1000000;
 
 public:
     Big(char _name) {
-        data = new char[1000000];
+        data = new char[ONE_MEGA_BYTE];
         id = cnt++;
         name = _name;
 
@@ -24,8 +26,8 @@ public:
 
     //copy ctor (Deep Copy)
     Big(const Big &other) {
-        data = new char[1000000];
-        memcpy(data, other.data, 1000000);
+        data = new char[ONE_MEGA_BYTE];
+        memcpy(data, other.data, ONE_MEGA_BYTE);
         id = cnt++;
         name = other.name;
 
@@ -45,8 +47,8 @@ public:
     Big& operator=(const Big &rhs) {
         if (this != &rhs) {
             delete []data;
-            data = new char[1000000];
-            memcpy(data, rhs.data, 1000000);
+            data = new char[ONE_MEGA_BYTE];
+            memcpy(data, rhs.data, ONE_MEGA_BYTE);
             name = rhs.name;
 
             cout << "id : " << id << " "
@@ -67,7 +69,32 @@ public:
 
 int Big::cnt = 1;
 
-TEST(TaskGoF, testMoveSemantics) {
+void takeBig(Big &b){
+    cout<< "[in takeBig] :" << b.id <<"\n";
+}
+
+Big& returnBig(){
+    Big *res = new Big('n');
+    return *res;
+}
+
+unique_ptr<Big> returnBig2(){
+    return unique_ptr<Big>(new Big('j'));
+}
+
+
+TEST(CppSkills, testMoveSemantics) {
+/*    Big b('A');
+    takeBig(b);
+
+    {
+        Big &a = returnBig();
+        std::unique_ptr<Big> p = returnBig2();
+        delete &a;
+    }
+    cout<<"-=-=-=-=-=-=-\n";*/
+
+/*
     Big a{'a'};
     cout << "---------------------------------------------------------" << endl;
     Big b{'b'};
@@ -82,4 +109,16 @@ TEST(TaskGoF, testMoveSemantics) {
 
     for( auto& e : vec) // use auto& rather than auto
         cout << e.name << ", ";
+    cout<<"\n\n";
+*/
 }
+
+/* TODO: returning class object without copy.
+ *      case1: returning existing object (e.g. member)
+ *      case2: returning newly created object (factory)
+ *             In order to invoke dtor at the end of caller scope, how to pass ownership to caller?
+ * TODO: what is the best way to return stl container? (return collection)
+ * TODO: understand Return Value Optimization (RVO) and how we can ensure(test) this happen. CAN WE TRUST THIS?
+ * TODO: understand copy ellision
+ * TODO: what is best way to make factory method? use smart pointer and return it?
+ * */

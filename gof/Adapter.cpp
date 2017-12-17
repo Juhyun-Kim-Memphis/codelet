@@ -46,7 +46,7 @@ void Dialer::digit(int n){
     dialedDigit = n;
 }
 
-TEST(TaskGoF, testIfDigitIsDialed) {
+TEST(TestGoF, testIfDigitIsDialed) {
     Dialer dialer;
     ButtonDialerAdapter *bda = new ButtonDialerAdapter(&dialer, 7);
     Button button(bda);
