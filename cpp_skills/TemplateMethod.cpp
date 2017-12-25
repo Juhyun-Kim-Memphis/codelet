@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
-
+#include <type_traits>
+#include <utility>
 using namespace std;
 
 class Task;
 class Message {};
 class Event {};
 class DerivedEvent : public Event {};
+class DerivedEvent2 : public Event {};
 
 /* TODO: eventFactory should be method template */
 Event *eventFactory(Message m){
@@ -27,6 +29,8 @@ public:
 };
 
 ///////////////////
+template<typename T> /* T should be std::integral_constant<int, ?> */
+struct Increment : std::integral_constant<int, T::value+1> {};
 
 /*! The template `has_void_handleEvent_no_args_const<T>` exports a
     boolean constant `value` that is true iff `T` provides
@@ -36,6 +40,45 @@ public:
     invokes void `T::handleEvent() const` upon `t` if such a public member
     function exists and is a no-op if there is no such member.
 */
+
+template< typename T>
+struct cnt_void_handleEvent_DerivedEvent
+{
+    /* SFINAE handleEvent-has-correct-sig :) */
+    template<typename A>
+    static Increment<integral_constant<int, 0>> testSignature(void (A::*)(DerivedEvent *)) {
+        return Increment<integral_constant<int, 0>>();
+    }
+
+    template <typename A>
+    using methodType = decltype(&A::handleEvent);
+
+//    template<typename C, typename... Ts>
+//    using methodType = decltype(std::declval<C>().handleEvent(std::declval<Ts>()...))(Ts...);
+
+    template <typename A>
+    using countResult = decltype(testSignature(std::declval<methodType<A>>()));
+
+    /* SFINAE handleEvent-exists :) */
+    template <typename A>
+    static countResult<A>
+    countDeducingSuccess(decltype(&A::handleEvent),void *) {
+        /* handleEvent exists. What about sig? */
+        typedef countResult<A> result;
+        return result();
+    }
+
+    /* SFINAE fails. counter must be intact :( */
+    template<typename A>
+    static integral_constant<int, 0> countDeducingSuccess(...) {
+        return integral_constant<int, 0>();
+    }
+
+    /* This will be either `std::true_type` or `std::false_type` */
+    typedef decltype(countDeducingSuccess<T>(nullptr, nullptr)) type;
+
+    static const int count = type::value; /* Which is it? */
+};
 
 template< typename T>
 struct has_void_handleEvent_DerivedEvent
@@ -64,7 +107,7 @@ struct has_void_handleEvent_DerivedEvent
     /* This will be either `std::true_type` or `std::false_type` */
     typedef decltype(deducingTypeTF<T>(nullptr, nullptr)) type;
 
-    static const bool value = type::value; /* Which is it? */
+    static const bool isTrue = type::value; /* Which is it? */
 
     /*  `eval(T const &,std::true_type)`
         delegates to `T::handleEvent()` when `type` == `std::true_type`
@@ -92,6 +135,9 @@ public:
     void handleEvent(DerivedEvent *ev) {
         cout<<"handleEvent DerivedEvent actual called."<<endl;
     }
+//    void handleEvent2(int a, int b) {
+//        cout<<"handleEvent2 DerivedEvent actual called."<<endl;
+//    }
 };
 
 class ChildTask2 : public Task {
@@ -110,14 +156,19 @@ TEST(CppSkills, testTemplateMethod) {
     DerivedEvent de;
 
     ChildTask c1;
-    std::cout << (has_void_handleEvent_DerivedEvent<ChildTask>::value ?
+    std::cout << (has_void_handleEvent_DerivedEvent<ChildTask>::isTrue ?
                   "ChildTask has handleEvent" : "ChildTask does not have handleEvent")
               << std::endl;
     f(c1, &de);
 
     ChildTask2 c2;
-    std::cout << (has_void_handleEvent_DerivedEvent<ChildTask2>::value ?
+    std::cout << (has_void_handleEvent_DerivedEvent<ChildTask2>::isTrue ?
                   "ChildTask2 has handleEvent" : "ChildTask2 does not have handleEvent")
               << std::endl;
+
+    std::cout << Increment<std::integral_constant<int,4>>::value << endl;
+    std::cout << cnt_void_handleEvent_DerivedEvent<ChildTask>::count << endl;
+    std::cout << cnt_void_handleEvent_DerivedEvent<ChildTask2>::count << endl;
+
     f(c2, &de);
 }
