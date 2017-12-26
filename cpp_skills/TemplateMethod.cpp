@@ -22,11 +22,9 @@ void handleEvent(DerivedEventType *ev){
 
 class Task {
 public:
-    virtual void handle(Message m) {
-        Event *ev = eventFactory(m);
-        handleEvent(ev);
-    }
+    virtual void handle(Message m);
 };
+
 
 ///////////////////
 template<typename T> /* T should be std::integral_constant<int, ?> */
@@ -150,6 +148,15 @@ void f(T &val, DerivedEvent *ev) {
     has_void_handleEvent_DerivedEvent<T>::eval(val, ev);
 }
 
+void Task::handle(Message m) {
+    Event *ev = eventFactory(m);
+    handleEvent(ev);
+    DerivedEvent de;
+
+    f(*this, &de);
+}
+
+
 TEST(CppSkills, testTemplateMethod) {
     ChildTask *ct = new ChildTask;
     ct->handle(Message());
@@ -159,7 +166,7 @@ TEST(CppSkills, testTemplateMethod) {
     std::cout << (has_void_handleEvent_DerivedEvent<ChildTask>::isTrue ?
                   "ChildTask has handleEvent" : "ChildTask does not have handleEvent")
               << std::endl;
-    f(c1, &de);
+    //f(c1, &de);
 
     ChildTask2 c2;
     std::cout << (has_void_handleEvent_DerivedEvent<ChildTask2>::isTrue ?
