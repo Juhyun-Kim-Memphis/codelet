@@ -23,3 +23,12 @@ double Rental::getCharge() const {
     }
     return result;
 }
+
+int Rental::getFrequentRenterPoints() const {
+    // give bonus if you rent NEW_RELEASE more than two days.
+    if((getMovie().getPriceCode() == Movie::NEW_RELEASE) &&
+       getDaysRented() > 1 )
+        return 2;
+    else
+        return 1;
+}

@@ -20,6 +20,8 @@ public:
     }
 
     string statement();
+    double getTotalCharge() const;
+    int getTotalFrequentRenterPoints() const;
 
 private:
     string _name;

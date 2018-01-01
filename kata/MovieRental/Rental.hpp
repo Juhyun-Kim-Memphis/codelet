@@ -18,6 +18,7 @@ public:
     }
 
     double getCharge() const;
+    int getFrequentRenterPoints() const;
 
 private:
     Movie _movie;
