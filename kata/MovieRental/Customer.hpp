@@ -25,7 +25,6 @@ private:
     string _name;
     vector<Rental> _rentals;
 
-    double amountFor(const Rental &each) const;
 };
 
 #endif //CODELET_CUSTOMER_HPP

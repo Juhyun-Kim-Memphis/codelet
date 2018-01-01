@@ -11,10 +11,7 @@ string Customer::statement() {
     vector<Rental>::iterator it = _rentals.begin();
 
     while(it != _rentals.end()){
-        double thisAmount = 0;
         Rental each = *it;
-
-        thisAmount = amountFor(each);
 
         // point increment by 1.
         frequentRenterPoints++;
@@ -26,9 +23,9 @@ string Customer::statement() {
 
         // print out the movie info that currently renting.
         result += "\t" + each.getMovie().getTitle() + "\t" +
-                  to_string(thisAmount) + "\n";
+                  to_string(each.getCharge()) + "\n";
         // All accumulated amount
-        totalAmount += thisAmount;
+        totalAmount += each.getCharge();
 
         ++it;
     }
@@ -39,6 +36,3 @@ string Customer::statement() {
     return result;
 }
 
-double Customer::amountFor(const Rental &each) const {
-    return each.getCharge();
-}
