@@ -1,10 +1,11 @@
 #include <string>
+#include <iostream>
 #include "Movie.hpp"
 
 using namespace std;
 
-Movie::Movie(string _title, int _priceCode) : _title(_title) {
-    price = new Price(_priceCode);
+Movie::Movie(string _title, int _priceCode) : _title(_title), price(nullptr) {
+    setPriceCode(_priceCode);
 }
 
 Movie::~Movie() {
@@ -26,6 +27,25 @@ int Movie::getFrequentRenterPoints(int daysRented) const {
         return 2;
     else
         return 1;
+}
+
+void Movie::setPriceCode(int _priceCode) {
+    if(price)
+        delete price;
+
+    switch (_priceCode) {
+        case Movie::REGULAR :
+            price = new RegularPrice;
+            break;
+        case Movie::NEW_RELEASE :
+            price = new NewReleasePrice;
+            break;
+        case Movie::CHILDRENS :
+            price = new ChildrensPrice;
+            break;
+        default:
+            throw string("Illegal price code for movie\n");
+    }
 }
 
 
