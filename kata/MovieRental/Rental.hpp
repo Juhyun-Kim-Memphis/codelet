@@ -17,6 +17,8 @@ public:
         return _daysRented;
     }
 
+    double getCharge() const;
+
 private:
     Movie _movie;
     int _daysRented;
