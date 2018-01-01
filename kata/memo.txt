@@ -1,0 +1,3 @@
+codingkata.org
+codekata.pragprog.com
+http://katas.softwarecraftsmanship.org/

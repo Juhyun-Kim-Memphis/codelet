@@ -36,8 +36,7 @@ void func(ClassObj a){
 //    while(1){
 //        this_thread::sleep_for(std::chrono::milliseconds(100)); /*DO NOTHING*/
 //    }
-    this_thread::sleep_for(std::chrono::seconds(2));
-    std::terminate();
+//    this_thread::sleep_for(std::chrono::seconds(2));
 }
 
 void threadMain(void){
@@ -49,9 +48,9 @@ void threadMain(void){
 TEST(CppSkills, testStandardThread) {
     ClassObj::cnt=0;
     std::thread victim(threadMain);
-    this_thread::sleep_for(std::chrono::milliseconds(500));
+//    this_thread::sleep_for(std::chrono::milliseconds(500));
     EXPECT_EQ(true, victim.joinable());
 //    victim.~thread();
 //    EXPECT_EQ(false, victim.joinable());
-//    victim.join();
+    victim.join();
 }
