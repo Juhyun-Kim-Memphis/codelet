@@ -3,24 +3,20 @@
 
 using namespace std;
 
+Movie::Movie(string _title, int _priceCode) : _title(_title) {
+    price = new Price(_priceCode);
+}
+
+Movie::~Movie() {
+    delete price;
+}
+
+int Movie::getPriceCode() const {
+    return price->getPriceCode();
+}
+
 double Movie::getCharge(int daysRented) const {
-    double result = 0;
-    switch (getPriceCode()) {
-        case Movie::REGULAR :
-            result += 2;
-            if(daysRented > 2)
-                result += (daysRented - 2) * 1.5;
-            break;
-        case Movie::NEW_RELEASE :
-            result += daysRented * 3;
-            break;
-        case Movie::CHILDRENS :
-            result += 1.5;
-            if(daysRented > 3)
-                result += (daysRented - 3) * 1.5;
-            break;
-    }
-    return result;
+    return price->getCharge(daysRented);
 }
 
 int Movie::getFrequentRenterPoints(int daysRented) const {
@@ -31,3 +27,5 @@ int Movie::getFrequentRenterPoints(int daysRented) const {
     else
         return 1;
 }
+
+
