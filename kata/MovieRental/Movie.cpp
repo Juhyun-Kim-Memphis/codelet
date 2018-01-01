@@ -21,12 +21,7 @@ double Movie::getCharge(int daysRented) const {
 }
 
 int Movie::getFrequentRenterPoints(int daysRented) const {
-    // give bonus if you rent NEW_RELEASE more than two days.
-    if((getPriceCode() == Movie::NEW_RELEASE) &&
-       daysRented > 1 )
-        return 2;
-    else
-        return 1;
+    return price->getFrequentRenterPoints(daysRented);
 }
 
 void Movie::setPriceCode(int _priceCode) {
@@ -47,5 +42,3 @@ void Movie::setPriceCode(int _priceCode) {
             throw string("Illegal price code for movie\n");
     }
 }
-
-

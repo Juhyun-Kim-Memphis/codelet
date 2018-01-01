@@ -37,6 +37,10 @@ class Price {
 public:
     virtual int getPriceCode() const = 0;
     virtual double getCharge(int daysRented) const = 0;
+
+    virtual int getFrequentRenterPoints(int daysRented){
+        return 1;
+    }
 };
 
 class ChildrensPrice : public Price {
@@ -71,6 +75,10 @@ public:
 
     double getCharge(int daysRented) const override {
         return daysRented * 3;
+    }
+
+    int getFrequentRenterPoints(int daysRented) override {
+        return daysRented > 1 ? 2 : Price::getFrequentRenterPoints(daysRented);
     }
 };
 
