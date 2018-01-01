@@ -25,6 +25,9 @@ public:
         return _title;
     }
 
+    double getCharge(int daysRented) const;
+    int getFrequentRenterPoints(int daysRented) const;
+
 private:
     string _title;
     int _priceCode;
