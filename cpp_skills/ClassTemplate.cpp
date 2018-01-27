@@ -4,7 +4,9 @@
 /* http://timmurphy.org/2014/08/28/passing-member-functions-as-template-parameters-in-c/
  * https://stackoverflow.com/questions/13385397/static-member-function-pointer-as-template-argument
  * https://stackoverflow.com/questions/1174169/function-passed-as-template-argument
+ * https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
  * */
+
 void bar(){
     std::cout<<"bar"<<std::endl;
 }
@@ -31,6 +33,10 @@ public:
     void method() {
         std::cout<<"ClsA: method"<<std::endl;
     }
+
+    void methodB() {
+        std::cout<<"ClsA: methodB"<<std::endl;
+    }
 };
 
 template <class T>
@@ -53,6 +59,7 @@ TEST(CppSkills, testClassTemplate) {
     a->methodCall(&ClsA::method);
     a->method();
     a->staticMemberCall(ClsA::func);
+    a->methodCall(&ClsA::methodB);
 }
 
 //class IClsB {
