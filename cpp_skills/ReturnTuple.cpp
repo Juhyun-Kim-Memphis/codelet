@@ -32,15 +32,10 @@ std::tuple<int, std::string, Foo, std::vector<int>> returnTuple() {
     return std::make_tuple(3, "hello", Foo(1, 3.0), std::vector<int>({1, 2}));
 };
 
-std::tuple<int, std::string, Foo, std::vector<int>> returnTupleAsInitList() {
-    return {3, "hello", Foo(1, 3.0), {1, 2}}; // Error until C++17 ?
-};
 
 TEST(CppSkills, testReturnTuple) {
     /* warning: Copy ctor is invoked many times. */
     EXPECT_EQ(std::make_tuple(3, "hello", Foo(1, 3.0), std::vector<int>({1, 2})), returnTuple());
-    EXPECT_EQ(std::make_tuple(3, "hello", Foo(1, 3.0), std::vector<int>({1, 2})), returnTupleAsInitList());
-    EXPECT_EQ(returnTuple(), returnTupleAsInitList());
 
     auto res = returnTuple();
     EXPECT_EQ(3, std::get<0>(res));
@@ -52,9 +47,4 @@ TEST(CppSkills, testReturnTuple) {
     std::string snd;
     Foo trd;
     std::vector<int> fth;
-    std::tie(fst, snd, trd, fth) = returnTupleAsInitList();
-    EXPECT_EQ(3, fst);
-    EXPECT_EQ("hello", snd);
-    EXPECT_EQ(Foo(1, 3.0), trd);
-    EXPECT_EQ(std::vector<int>({1, 2}), fth);
 }

@@ -38,6 +38,10 @@ public:
     virtual int getPriceCode() const = 0;
     virtual double getCharge(int daysRented) const = 0;
 
+    virtual ~Price() {
+
+    }
+
     virtual int getFrequentRenterPoints(int daysRented){
         return 1;
     }

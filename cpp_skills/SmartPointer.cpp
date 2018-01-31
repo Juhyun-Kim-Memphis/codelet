@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 
 class Fooo {
 public:

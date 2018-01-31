@@ -90,13 +90,13 @@ public:
         os << in;
     }
 
-    Buf(Buf&& b) : id(objCnt), data(std::move(b.data)) {
-        std::ostream os (&b.data);
-        os << std::string("invalid");
-
-        cout << " move ctor "<< id<<endl;
-        objCnt++;
-    }
+//    Buf(Buf&& b) : id(objCnt), data(std::move(b.data)) {
+//        std::ostream os (&b.data);
+//        os << std::string("invalid");
+//
+//        cout << " move ctor "<< id<<endl;
+//        objCnt++;
+//    }
 
     Buf(const Buf& b) : id(objCnt) {
         cout << " copy ctor "<< id<<endl;

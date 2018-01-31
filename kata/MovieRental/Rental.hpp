@@ -7,10 +7,10 @@ using namespace std;
 
 class Rental {
 public:
-    Rental(Movie _movie, int _daysRented) : _movie(_movie), _daysRented(_daysRented) {}
+    Rental(Movie *_movie, int _daysRented) : _movie(_movie), _daysRented(_daysRented) {}
 
     const Movie &getMovie() const {
-        return _movie;
+        return *_movie;
     }
 
     int getDaysRented() const {
@@ -21,7 +21,7 @@ public:
     int getFrequentRenterPoints() const;
 
 private:
-    Movie _movie;
+    Movie *_movie;
     int _daysRented;
 };
 
